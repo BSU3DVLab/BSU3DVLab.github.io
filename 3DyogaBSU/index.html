@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>3D-Yoga: A 3D Yoga Dataset for Hierarchical Sports Action Analysis</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <style>
+      body {
+        background: #ffffff no-repeat fixed top left;
+        font-family:'Arial', sans-serif;
+      }
+    </style>
+  </head>
+
+  <!-- cover -->
+  <section>
+    <div class="jumbotron text-center mt-0">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <br>
+            <h1><b>3D-Yoga: A 3D Yoga Dataset for Hierarchical Sports Action Analysis</b></h1>
+            <br>
+            <h2> 
+              <a>Jianwei Li<sup>1</sup></a> &nbsp;&nbsp; 
+              <a>Haiqing Hu<sup>1</sup></a> &nbsp;&nbsp;
+              <a>Jinyang Li<sup>1</sup></a> &nbsp;&nbsp;
+              <a>Xiaomei Zhao<sup>2</sup></a> &nbsp;&nbsp;
+            </h2>
+            <h3>
+              <p> <sup>1 </sup>Beijing Sport University &nbsp;&nbsp;<sup>2 </sup>Shandong Jianzhu University
+            </h3>
+            <br>
+            <h3><b>The 16th Asian Conference on Computer Vision (ACCV2022)</b></h3>
+            </p>  
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- abstract -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Abstract</b></h1>
+          <br>
+          <h4>
+            <p class="text-justify"><b>
+              Visual-based human action analysis is an important research topic in the field of computer vision,
+              and has great application prospect in sports performance analysis. 
+              Currently available 3D action analysis datasets have a number of limitations in sports application, 
+              including the lack of special sports actions, distinct class or score labels and variety of samples. 
+              Existing researches mainly use various special RGB videos for sports action analysis, 
+              but analysis with 2D features is less effective than 3D representation. In this paper, 
+              we introduce a new 3D yoga pose dataset (3D-Yoga) with more than 3,792 action samples and 16,668 
+              RGB-D key frames, collected from 22 subjects performing 117 kinds of yoga poses with two RGB-D cameras. 
+              We have reconstructed 3D yoga poses with sparse multi-view data and carried out experiments with the 
+              proposed cascade two-stream adaptive graph convolutional neural network (Cascade 2S-AGCN) to recognize and 
+              assess these poses. Experimental results have shown the advantage of applying our 3D skeleton fusion and hierarchical analysis 
+              methods on 3D-Yoga, and the accuracy of Cascade 2S-AGCN outperforms the state-of-theart methods. 
+              The introduction of 3D-Yoga will enable the community to apply, 
+              develop and adapt various methods for visual-based sports activity analysis.</b>
+              <br>
+              <br>
+              <br>
+              <img class="img-fluid" src="images/pic-1.png" alt="">      
+              <br>
+            </p>
+              <br>
+                <b>The pipeline of our proposed hierarchical yoga pose analysis method.
+              </b>
+          </h4>
+          <!--colorful gradient line-->
+          <br>
+          <br>
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div> 
+  </section>
+
+
+  <!-- Data acquisition setup -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h1><b> Data acquisition and examples</b></h1>
+            <br>
+            <img class="img-fluid" src="images/pic-2.png" alt="">
+            <br>
+            <br>
+            <h4><b><p class="text-justify">
+              The capturing of yoga poses in 3D-Yoga. 
+              (a) Scene layout. 
+              (b) Samples of yoga pose. 
+              (c) Scene elements: 1 and 2 are two indoor scenes; 
+              A, B, C, D, E, and F are the textures of the wall; 
+              a, b, c, and d are the textures of yoga mates. 
+              (d) Proportions of three light types. (e) Proportions of four cloth types.
+            </p></b></h4>
+            <!--colorful gradient line-->
+            <br>
+            <br>
+            <div class="box-show text-center mt-0"> </div>
+            <br>
+            <br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+
+ 
+<!-- Hierarchical sturcture for dataset -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h1><b> Hierarchical organization for yoga poses</b></h1>
+            <br>
+            <img class="img-fluid" src="images/pic-3.png" alt=""> 
+            <br>
+            <br>
+            <br>
+              <h4><b><p class="text-justify">
+                3D-Yoga dataset contains 117 categories of yoga poses 
+                performed by 22 subjects in various indoor environments.        
+              </p></b></h4>
+              <!--colorful gradient line-->
+              <br>
+              <br>
+              <div class="box-show text-center mt-0"> </div>
+              <br>
+              <br>
+        </div>
+      </div>
+    </div>
+  </section> 
+
+<!--Data fusion for 3D human skeleton-->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h1><b> 3D human skeleton data fusion</b></h1>
+            <br>
+              <img class="img-fluid" src="images/pic-4.png" alt="">
+              <br>
+              <br>
+              <!--<br>
+              <h4><b><p class="text-justify">
+              </b></h4>-->
+              <!--colorful gradient line-->
+              <br>
+              <br>
+              <div class="box-show text-center mt-0"> </div>
+              <br>
+              <br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!--Three-level cascaded 2S-AGCN networks-->
+<section>
+ <div class="container">
+   <div class="row">
+     <div class="col-12 text-center">
+         <h1><b> Three-level cascaded 2S-AGCN network<b></h1>
+           <br>
+           <br>
+           <img class="img-fluid" src="images/pic-5.png" alt="">
+           <br>
+           <br>
+           <h4><b><p class="text-justify">
+            The framework constructed by using 2S-AGCN models and fully connected layers with Dropout and ReLU. 
+            The trunk network and branches of Cascade 2S-AGCN are trained together. 
+            The input is the skeleton data, and the outputs of each level are the predicted results of Classification I, 
+            Classification II, and completion score respectively.</b></h4>
+            <!--colorful gradient line-->
+            <br>
+            <br>
+            <div class="box-show text-center mt-0"> </div>
+            <br>
+            <br>
+     </div>
+   </div>
+ </div>
+</section>
+
+<!--  Dataset download -->
+<section>
+ <div class="container">
+   <div class="row">
+     <div class="col-12 text-center">
+         <h1><b> Dataset download</b></h1>
+          <br>
+           <h4><p class="text-justify">
+            If someone wants to download the 3D-Yoga dataset, please fill in the 
+            <!--<a href="https://github.com/pigeonwarrior066/pigeonwarrior066.github.io/raw/main/agreement/3D-Yoga%20Dataset%20Agreement.docx" target="_blank">agreement</a>, -->
+            <a href="https://bsucv-my.sharepoint.com/:w:/g/personal/bsu_cv_bsucv_onmicrosoft_com/EZmI4jhHzD5CqVsFfEV3lUUBYrBggGz8-6adOsAuWnTyPg?rtime=xgQ4uOui2kg">agreement</a>, 
+            and email Haiqing Hu <<a href= "javascript:;">haiqinghu@bsu.edu.cn</a>> 
+            or Jianwei Li <<a href="javascript:;">jianwei@bsu.edu.cn</a>> to request the download link. 
+            <br>
+            <!--colorful gradient line-->
+            <br>
+            <br>
+            <div class="box-show text-center mt-0"> </div>
+            <br>
+            <br>
+      </div>
+   </div>
+ </div>
+</section>
+
+
+
+<!-- Cite-->
+<section>
+ <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="text-center mt-0">
+          <h1><b> Cite</b></h1>
+          <br>     
+          <div class="cite1 text-center mt-0">     
+              <h5 style="font-family:Courier New"><p class="text-justify">
+                @inproceedings{2022 3DYoga, <br>
+                title={3D-Yoga: A 3D Yoga Dataset for Hierarchical SportsAction Analysis},<br> 
+                author={ Li, Jianwei and Hu, Haing and Li, Jinyang and Zhao, Xiaomei}, <br>
+                booktitle={Asian Conference on Computer Vision (ACCV)},<br>
+                year={2022}, <br>
+                }
+              </h5>    
+          </div>
+      </div>
+    </div>
+  </div>
+ </div>
+
+
+  <footer class="text-center" style="margin-bottom:10px; font-size: medium;">
+      <hr>
+      <h6>Thanks to <a href="https://lioryariv.github.io/" target="_blank">Lior Yariv</a> for the <a href="https://lioryariv.github.io/idr/" target="_blank">website template</a>.
+      </h6>
+  </footer>
+
+  <script>
+    MathJax = {
+      tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</body>
+</html>
