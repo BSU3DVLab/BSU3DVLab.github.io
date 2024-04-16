@@ -12,9 +12,36 @@
         background: #ffffff no-repeat fixed top left;
         font-family:'Arial', sans-serif;
       }
+      .blue-text {
+      color: blue;
+      }
+      .floating-box {
+      position: fixed; /* 使用 fixed 定位 */
+      display: none; /* 初始状态隐藏 */
+      top: 40%; /* 距离顶部的距离 */
+      left: 35%; /* 距离左侧的距离 */
+      transform: translate(-50%, -50%); /* 让浮动框水平垂直居中 */
+      background-color: #fff; /* 设置背景颜色 */
+      padding: 12px; /* 设置内边距 */
+      border: 1px solid #000; /* 设置边框 */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 设置阴影 */
+      z-index: 999; /* 设置 z-index 值，确保浮动框在其他元素之上 */
+    }
+
+    /* 设置关闭按钮的样式 */
+    .close-btn {
+      position: absolute; /* 使用 absolute 定位 */
+      top: 5px; /* 距离顶部的距离 */
+      right: 5px; /* 距离右侧的距离 */
+      cursor: pointer; /* 鼠标样式为手型 */
+    }
     </style>
   </head>
-
+  <div class="floating-box" id="floatingBoxEC">
+    <span class="close-btn" onclick="closeFloatingBox()"></span>
+    <p>&#42;: Equal contribution.</p>
+    <p>&#167;: Corresponding author.</p>
+  </div>
   <!-- cover -->
   <section>
     <div class="jumbotron text-center mt-0">
@@ -25,8 +52,8 @@
             <h1><b>FineRehab: A Multi-modality and Multi-task Dataset for Rehabilitation Analysis</b></h1>
             <br>
             <h2> 
-              <a>Jianwei Li<sup>1</sup></a> &nbsp;&nbsp; 
-              <a>Jun Xue<sup>1</sup></a> &nbsp;&nbsp;
+              <a>Jianwei Li<sup id="EC" class="blue-text">&#42;&#167;</sup><sup>1</sup></a> &nbsp;&nbsp; 
+              <a>Jun Xue<sup id="EC2" class="blue-text">&#42;</sup><sup>1</sup></a> &nbsp;&nbsp;
               <a>Rui Cao<sup>1</sup></a> &nbsp;&nbsp;
               <a>Xiaoxia Du<sup>2</sup></a> &nbsp;&nbsp;<br>
               <a>Siyu Mo<sup>1</sup></a> &nbsp;&nbsp;
@@ -45,7 +72,39 @@
       </div>
     </div>
   </section>
+  <script>
+    var floatingBox = document.getElementById('floatingBoxEC');
+    var Text = document.getElementById('EC');
+    var Text2 = document.getElementById('EC2');
+    // 鼠标移动到文本时显示浮动框
+    Text.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出文本时隐藏浮动框
+    Text.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
 
+    Text2.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出"Danmm"文本时隐藏浮动框
+    Text2.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
+//-----------------------------------------------------------------
+
+    </script>
   <!-- abstract -->
   <section>
     <div class="container">
