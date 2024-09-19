@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Skeleton-Based Action Quality Assessment via Partially 
+      Connected LSTM with Triplet Losses</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <style>
+      body {
+        background: #ffffff no-repeat fixed top left;
+        font-family:'Arial', sans-serif;
+      }
+      .blue-text {
+      color: blue;
+      }
+      .floating-box {
+      position: fixed; /* 使用 fixed 定位 */
+      display: none; /* 初始状态隐藏 */
+      top: 40%; /* 距离顶部的距离 */
+      left: 35%; /* 距离左侧的距离 */
+      transform: translate(-50%, -50%); /* 让浮动框水平垂直居中 */
+      background-color: #fff; /* 设置背景颜色 */
+      padding: 12px; /* 设置内边距 */
+      border: 1px solid #000; /* 设置边框 */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 设置阴影 */
+      z-index: 999; /* 设置 z-index 值，确保浮动框在其他元素之上 */
+    }
+
+    /* 设置关闭按钮的样式 */
+    .close-btn {
+      position: absolute; /* 使用 absolute 定位 */
+      top: 5px; /* 距离顶部的距离 */
+      right: 5px; /* 距离右侧的距离 */
+      cursor: pointer; /* 鼠标样式为手型 */
+    }
+    </style>
+  </head>
+  <div class="floating-box" id="floatingBoxEC">
+    <span class="close-btn" onclick="closeFloatingBox()"></span>
+    <p>&#42;: Equal contribution.</p>
+    <p>&#167;: Corresponding author.</p>
+  </div>
+  <!-- cover -->
+  <section>
+    <div class="jumbotron text-center mt-0">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <br>
+            <h1><b>Skeleton-Based Action Quality Assessment via Partially 
+              Connected LSTM with Triplet Losses</b></h1>
+            <br>
+            <h2> 
+              Xinyu Wang<sup>1</sup> &nbsp;&nbsp; 
+              Jianwei Li<sup>1</sup> &nbsp;&nbsp;
+              Haiqing Hu<sup>1</sup>
+            </h2>
+            <h3>
+              <br>
+              <p> <sup>1 </sup>Beijing Sport University<br>
+            </h3>
+            <br>
+            <h3><b>Pattern Recognition and Computer Vision: 5th Chinese Conference, PRCV 2022</b></h3>
+            </p>  
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    var floatingBox = document.getElementById('floatingBoxEC');
+    var Text = document.getElementById('EC');
+    var Text2 = document.getElementById('EC2');
+    
+    // 鼠标移动到文本时显示浮动框
+    Text.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出文本时隐藏浮动框
+    Text.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
+
+    Text2.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出"Danmm"文本时隐藏浮动框
+    Text2.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
+//-----------------------------------------------------------------
+
+    </script>
+  <!-- abstract -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Abstract</b></h1>
+          <br>
+          <h4>
+            <p class="text-justify"><b><i><font face="Times New Roman">
+                            Human action quality assessment (AQA) recently has attracted increasing attentions in computer vision for its practical applications, such as skill 
+              training, physical rehabilitation and scoring sports events. In this paper, we propose a partially connected LSTM with triplet losses to evaluate different skill 
+              levels. Compared to human action recognition (HAR), we explain and discuss 
+              two characteristics and countermeasures of AQA. To ignore the negative influence of complex joint movements in actions, the skeleton is not regarded as a 
+              single graph. The fully connected layer in the LSTM model is replaced by the 
+              partially connected layer, using a diagonal matrix which activatesthe corresponding weights, to explore hierarchical relations in the skeleton graph. Furthermore, 
+              to improve the generalization ability of models, we introduce additional functions 
+              of triplet loss to the loss function, which make samples with similar skill levels 
+              close to each other. We carry out experiments to test our model and compare it 
+              with seven LSTM architectures and three GNN architectures on the UMONSTAICHI dataset and walking gait dataset. Experimental results demonstrate that 
+              our model achieves outstanding performance.
+              </font></i></b>
+              <br>
+              <br>
+              <br>
+              <img class="img-fluid" src="images/pipeline.png" alt="" style="width:70%; display: block; margin: 0 auto;">      
+              <br>
+            </p>
+              <br>
+                <font size="5"><b>The architecture of partially connected LSTM.</b></font>
+              </b>
+          </h4>
+          <!--colorful gradient line-->
+          <br>
+          <br>
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div> 
+  </section>
+
+<!-- Cite-->
+<section>
+ <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="text-center mt-0">
+          <h1><b> Cite</b></h1>
+          <br>     
+          <div class="cite1 text-center mt-0">     
+              <h5 style="font-family:Courier New"><p class="text-justify">
+                @inproceedings{10.1007/978-3-031-18913-5_17,<br>
+                  author = {Wang, Xinyu and Li, Jianwei and Hu, Haiqing},<br>
+                  title = {Skeleton-Based Action Quality Assessment via Partially Connected LSTM with Triplet Losses},<br>
+                  year = {2022},<br>
+                  doi = {10.1007/978-3-031-18913-5_17}
+                  }
+              </h5>    
+          </div>
+      </div>
+    </div>
+  </div>
+ </div>
+
+
+  <footer class="text-center" style="margin-bottom:10px; font-size: medium;">
+      <hr>
+      <h6>Thanks to <a href="https://lioryariv.github.io/" target="_blank">Lior Yariv</a> for the <a href="https://lioryariv.github.io/idr/" target="_blank">website template</a>.
+      </h6>
+  </footer>
+
+  <script>
+    MathJax = {
+      tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</body>
+</html>
