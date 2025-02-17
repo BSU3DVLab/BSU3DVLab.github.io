@@ -5311,8 +5311,10 @@ a.badge-dark:focus, a.badge-dark.focus {
 .jumbotron {
   /* padding: 1rem 1rem; */
   margin-bottom: 3rem;
-  background-color: #e9eeef; /*#e9ecef;*/ 
-  border-radius: 0.3rem;
+  /* background-color: var(--cyan); #e9ecef; #e9eeef */
+  background: radial-gradient(circle, var(--cyan), skyblue);
+  /* border-radius: 0.3rem; */
+  color:white;
 }
 
 @media (min-width: 546px) {
@@ -10295,7 +10297,7 @@ a.text-dark:hover, a.text-dark:focus {
   text-align: center;
 }
 #members .member{
-  margin:auto 250px;
+  margin:auto 18%;
   font-size: 20px;
   text-align: justify;
 }
