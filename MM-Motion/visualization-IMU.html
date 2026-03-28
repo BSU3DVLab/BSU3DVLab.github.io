@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Skeleton Motion Analysis (Three.js)</title>
+    <!-- 引入外部库 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; background-color: #020617; }
+        #main-scroll-container { height: 100vh; overflow-y: auto; overflow-x: hidden; }
+        /* 3D 渲染容器高度 */
+        #visualization-container { width: 100%; height: 65vh; background-color: #05070a; position: relative; border-bottom: 1px solid #1e293b; }
+        /* 分析区块，限制最大宽度并居中 */
+        .analysis-section { padding: 2rem 1.5rem; max-width: 1000px; margin: 0 auto; }
+        canvas { display: block; }
+        /* 图表卡片样式 */
+        .chart-card { background: #0f172a; border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #1e293b; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        /* 加载遮罩层 */
+        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; flex-direction: column; }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="text-slate-100">
+
+    <div id="main-scroll-container">
+        <!-- 顶部控制栏 -->
+        <header class="p-4 bg-slate-900 border-b border-slate-800 shadow-2xl flex flex-col md:flex-row items-center justify-between sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-cyan-500 rounded flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 uppercase">Motion Analysis Pro</h1>
+            </div>
+            <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                <label for="csvFileInput" class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg border border-slate-700 transition-all text-sm">
+                    Upload CSV
+                </label>
+                <button id="playPauseButton" onclick="toggleAnimation()" disabled class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-cyan-500/30 disabled:opacity-50 transition-all text-sm">
+                    <span id="playPauseText">Play</span>
+                </button>
+                <button id="exportGifButton" onclick="exportToGif()" disabled class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg disabled:opacity-50 transition-all text-sm text-nowrap">
+                    Export GIF
+                </button>
+                <button id="resetButton" onclick="resetAnimation()" disabled class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-lg disabled:opacity-50 transition-all text-sm">
+                    Reset
+                </button>
+            </div>
+        </header>
+        
+        <!-- 播放进度条 -->
+        <div class="p-3 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center space-x-4 sticky top-[73px] z-40">
+            <div class="flex-1">
+                <div class="flex justify-between text-[10px] text-slate-500 mb-1 px-1 uppercase font-mono tracking-widest">
+                    <span>Playback Timeline</span>
+                    <span>Total Frames: <span id="totalFramesDisplay" class="text-cyan-400">0</span></span>
+                </div>
+                <input type="range" id="frameSlider" min="0" max="0" value="0" disabled 
+                       class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 hover:accent-cyan-400 transition-all"
+                       oninput="handleFrameScrubbing(this.value)">
+            </div>
+        </div>
+
+        <!-- 3D 可视化区域 -->
+        <div id="visualization-container">
+            <div id="axes-controls-container" class="absolute top-4 right-4 bg-slate-900/90 backdrop-blur p-4 rounded-xl border border-slate-800 shadow-2xl w-48 z-10">
+                <h3 class="text-[10px] font-black text-slate-500 mb-3 border-b border-slate-800 pb-2 uppercase tracking-tighter">View Options</h3>
+                <div class="space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input type="checkbox" id="axesVisibility" checked onchange="toggleAxesVisibility(this.checked)" class="form-checkbox h-3.5 w-3.5 text-cyan-500 bg-slate-800 border-slate-700 rounded transition-all">
+                        <span class="text-xs text-slate-400 group-hover:text-slate-200 transition-colors">Show Axes</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input type="checkbox" id="trajectoryVisibility" checked onchange="toggleTrajectoryVisibility(this.checked)" class="form-checkbox h-3.5 w-3.5 text-emerald-500 bg-slate-800 border-slate-700 rounded transition-all">
+                        <span class="text-xs text-slate-400 group-hover:text-slate-200 transition-colors">Show Trajectories</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div id="loadingOverlay" class="loading-overlay hidden">
+                <div class="w-10 h-10 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div id="loadingText" class="text-sm font-mono tracking-widest text-slate-400 uppercase">Processing Data...</div>
+                <div id="loadingProgress" class="mt-2 text-xs text-cyan-500 font-mono"></div>
+            </div>
+        </div>
+
+        <!-- 下方分析区块（全垂直排列） -->
+        <div class="analysis-section">
+            <div class="flex items-center justify-between mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-xl font-black text-slate-300 uppercase tracking-widest">Performance Reports</h2>
+                <div id="status-display" class="text-cyan-500 font-mono text-xs uppercase tracking-widest">System Ready</div>
+            </div>
+
+            <!-- 1. 小腿角速度图 (Shank Angular Velocity) -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Shank Angular Velocity
+                    </h3>
+                    <div class="text-[10px] font-mono text-slate-500">Unit: rad/s</div>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="velocityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. 躯干倾斜角图 (Trunk Tilt Angle) -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]"></span> Trunk Tilt Stability
+                    </h3>
+                    <div class="text-[10px] font-mono text-slate-500">Unit: Degrees (°)</div>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="tiltChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 3. 倾斜方向空间分布 (Spatial Distribution) -->
+            <div class="chart-card">
+                <h3 class="text-sm font-bold text-slate-200 mb-6 uppercase tracking-wider">Spatial Orientation Distribution</h3>
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-2/3 h-80 relative">
+                        <canvas id="roseChart"></canvas>
+                    </div>
+                    <div class="w-full md:w-1/3 space-y-4">
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/50">
+                            <p class="text-[11px] text-slate-400 leading-relaxed font-mono">
+                                <strong class="text-slate-200">Analysis Mode:</strong> Polar projection on XZ plane.<br><br>
+                                This chart illustrates the directional frequency of body tilt, identifying potential balance asymmetries during movement.
+                            </p>
+                        </div>
+                        <!-- 元数据摘要 -->
+                        <div class="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-[10px] font-mono space-y-2">
+                            <div class="flex justify-between"><span class="text-slate-500">Sampling Rate:</span> <span class="text-slate-300">90 FPS</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">Kinematic Nodes:</span> <span class="text-slate-300">59 Points</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">Sync Status:</span> <span id="frame-info" class="text-cyan-400 tracking-tighter">FRAME: 0 / 0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // 1. 常量与骨架配置
+        // ----------------------------------------------------
+        const FPS = 90;
+        const frameInterval = 1000 / FPS;
+        const SKELETON_COLOR = 0x00e5ff; 
+        const TRAJECTORY_COLOR_LEFT = 0x10b981; 
+        const TRAJECTORY_COLOR_RIGHT = 0xf43f5e; 
+        const JOINT_RADIUS = 0.018; 
+        const BONE_RADIUS = 0.0045; 
+        const AXES_HELPER_SCALE = 0.6;
+
+        let charts = { velocity: null, tilt: null, rose: null };
+        let trajectoryLines = { left: null, right: null };
+
+        const skeletonDefinition = [
+            ["Hips", "Hips", 0, -1, ["Hips-Joint-Posi-x", "Hips-Joint-Posi-y", "Hips-Joint-Posi-z"]],
+            ["RightUpLeg", "RightUpLeg", 1, 0, ["RightUpLeg-Joint-Posi-x", "RightUpLeg-Joint-Posi-y", "RightUpLeg-Joint-Posi-z"]],
+            ["RightLeg", "RightLeg", 2, 1, ["RightLeg-Joint-Posi-x", "RightLeg-Joint-Posi-y", "RightLeg-Joint-Posi-z"]],
+            ["RightFoot", "RightFoot", 3, 2, ["RightFoot-Joint-Posi-x", "RightFoot-Joint-Posi-y", "RightFoot-Joint-Posi-z"]],
+            ["LeftUpLeg", "LeftUpLeg", 4, 0, ["LeftUpLeg-Joint-Posi-x", "LeftUpLeg-Joint-Posi-y", "LeftUpLeg-Joint-Posi-z"]],
+            ["LeftLeg", "LeftLeg", 5, 4, ["LeftLeg-Joint-Posi-x", "LeftLeg-Joint-Posi-y", "LeftLeg-Joint-Posi-z"]],
+            ["LeftFoot", "LeftFoot", 6, 5, ["LeftFoot-Joint-Posi-x", "LeftFoot-Joint-Posi-y", "LeftFoot-Joint-Posi-z"]],
+            ["Spine", "Spine", 7, 0, ["Spine-Joint-Posi-x", "Spine-Joint-Posi-y", "Spine-Joint-Posi-z"]],
+            ["Spine1", "Spine1", 8, 7, ["Spine1-Joint-Posi-x", "Spine1-Joint-Posi-y", "Spine1-Joint-Posi-z"]],
+            ["Spine2", "Spine2", 9, 8, ["Spine2-Joint-Posi-x", "Spine2-Joint-Posi-y", "Spine2-Joint-Posi-z"]],
+            ["Neck", "Neck", 10, 9, ["Neck-Joint-Posi-x", "Neck-Joint-Posi-y", "Neck-Joint-Posi-z"]],
+            ["Neck1", "Neck1", 11, 10, ["Neck1-Joint-Posi-x", "Neck1-Joint-Posi-y", "Neck1-Joint-Posi-z"]],
+            ["Head", "Head", 12, 11, ["Head-Joint-Posi-x", "Head-Joint-Posi-y", "Head-Joint-Posi-z"]],
+            ["RightShoulder", "RightShoulder", 13, 8, ["RightShoulder-Joint-Posi-x", "RightShoulder-Joint-Posi-y", "RightShoulder-Joint-Posi-z"]],
+            ["RightArm", "RightArm", 14, 13, ["RightArm-Joint-Posi-x", "RightArm-Joint-Posi-y", "RightArm-Joint-Posi-z"]],
+            ["RightForeArm", "RightForeArm", 15, 14, ["RightForeArm-Joint-Posi-x", "RightForeArm-Joint-Posi-y", "RightForeArm-Joint-Posi-z"]],
+            ["RightHand", "RightHand", 16, 15, ["RightHand-Joint-Posi-x", "RightHand-Joint-Posi-y", "RightHand-Joint-Posi-z"]],
+            ["RightHandThumb1", "RightHandThumb1", 17, 16, ["RightHandThumb1-Joint-Posi-x", "RightHandThumb1-Joint-Posi-y", "RightHandThumb1-Joint-Posi-z"]],
+            ["RightHandThumb2", "RightHandThumb2", 18, 17, ["RightHandThumb2-Joint-Posi-x", "RightHandThumb2-Joint-Posi-y", "RightHandThumb2-Joint-Posi-z"]],
+            ["RightHandThumb3", "RightHandThumb3", 19, 18, ["RightHandThumb3-Joint-Posi-x", "RightHandThumb3-Joint-Posi-y", "RightHandThumb3-Joint-Posi-z"]],
+            ["RightInHandIndex", "RightInHandIndex", 20, 16, ["RightInHandIndex-Joint-Posi-x", "RightInHandIndex-Joint-Posi-y", "RightInHandIndex-Joint-Posi-z"]],
+            ["RightHandIndex1", "RightHandIndex1", 21, 20, ["RightHandIndex1-Joint-Posi-x", "RightHandIndex1-Joint-Posi-y", "RightHandIndex1-Joint-Posi-z"]],
+            ["RightHandIndex2", "RightHandIndex2", 22, 21, ["RightHandIndex2-Joint-Posi-x", "RightHandIndex2-Joint-Posi-y", "RightHandIndex2-Joint-Posi-z"]],
+            ["RightHandIndex3", "RightHandIndex3", 23, 22, ["RightHandIndex3-Joint-Posi-x", "RightHandIndex3-Joint-Posi-y", "RightHandIndex3-Joint-Posi-z"]],
+            ["RightInHandMiddle", "RightInHandMiddle", 24, 16, ["RightInHandMiddle-Joint-Posi-x", "RightInHandMiddle-Joint-Posi-y", "RightInHandMiddle-Joint-Posi-z"]],
+            ["RightHandMiddle1", "RightHandMiddle1", 25, 24, ["RightHandMiddle1-Joint-Posi-x", "RightHandMiddle1-Joint-Posi-y", "RightHandMiddle1-Joint-Posi-z"]],
+            ["RightHandMiddle2", "RightHandMiddle2", 26, 25, ["RightHandMiddle2-Joint-Posi-x", "RightHandMiddle2-Joint-Posi-y", "RightHandMiddle2-Joint-Posi-z"]],
+            ["RightHandMiddle3", "RightHandMiddle3", 27, 26, ["RightHandMiddle3-Joint-Posi-x", "RightHandMiddle3-Joint-Posi-y", "RightHandMiddle3-Joint-Posi-z"]],
+            ["RightInHandRing", "RightInHandRing", 28, 16, ["RightInHandRing-Joint-Posi-x", "RightInHandRing-Joint-Posi-y", "RightInHandRing-Joint-Posi-z"]],
+            ["RightHandRing1", "RightHandRing1", 29, 28, ["RightHandRing1-Joint-Posi-x", "RightHandRing1-Joint-Posi-y", "RightHandRing1-Joint-Posi-z"]],
+            ["RightHandRing2", "RightHandRing2", 30, 29, ["RightHandRing2-Joint-Posi-x", "RightHandRing2-Joint-Posi-y", "RightHandRing2-Joint-Posi-z"]],
+            ["RightHandRing3", "RightHandRing3", 31, 30, ["RightHandRing3-Joint-Posi-x", "RightHandRing3-Joint-Posi-y", "RightHandRing3-Joint-Posi-z"]],
+            ["RightInHandPinky", "RightInHandPinky", 32, 16, ["RightInHandPinky-Joint-Posi-x", "RightInHandPinky-Joint-Posi-y", "RightInHandPinky-Joint-Posi-z"]],
+            ["RightHandPinky1", "RightHandPinky1", 33, 32, ["RightHandPinky1-Joint-Posi-x", "RightHandPinky1-Joint-Posi-y", "RightHandPinky1-Joint-Posi-z"]],
+            ["RightHandPinky2", "RightHandPinky2", 34, 33, ["RightHandPinky2-Joint-Posi-x", "RightHandPinky2-Joint-Posi-y", "RightHandPinky2-Joint-Posi-z"]],
+            ["RightHandPinky3", "RightHandPinky3", 35, 34, ["RightHandPinky3-Joint-Posi-x", "RightHandPinky3-Joint-Posi-y", "RightHandPinky3-Joint-Posi-z"]],
+            ["LeftShoulder", "LeftShoulder", 36, 8, ["LeftShoulder-Joint-Posi-x", "LeftShoulder-Joint-Posi-y", "LeftShoulder-Joint-Posi-z"]],
+            ["LeftArm", "LeftArm", 37, 36, ["LeftArm-Joint-Posi-x", "LeftArm-Joint-Posi-y", "LeftArm-Joint-Posi-z"]],
+            ["LeftForeArm", "LeftForeArm", 38, 37, ["LeftForeArm-Joint-Posi-x", "LeftForeArm-Joint-Posi-y", "LeftForeArm-Joint-Posi-z"]],
+            ["LeftHand", "LeftHand", 39, 38, ["LeftHand-Joint-Posi-x", "LeftHand-Joint-Posi-y", "LeftHand-Joint-Posi-z"]],
+            ["LeftHandThumb1", "LeftHandThumb1", 40, 39, ["LeftHandThumb1-Joint-Posi-x", "LeftHandThumb1-Joint-Posi-y", "LeftHandThumb1-Joint-Posi-z"]],
+            ["LeftHandThumb2", "LeftHandThumb2", 41, 40, ["LeftHandThumb2-Joint-Posi-x", "LeftHandThumb2-Joint-Posi-y", "LeftHandThumb2-Joint-Posi-z"]],
+            ["LeftHandThumb3", "LeftHandThumb3", 42, 41, ["LeftHandThumb3-Joint-Posi-x", "LeftHandThumb3-Joint-Posi-y", "LeftHandThumb3-Joint-Posi-z"]],
+            ["LeftInHandIndex", "LeftInHandIndex", 43, 39, ["LeftInHandIndex-Joint-Posi-x", "LeftInHandIndex-Joint-Posi-y", "LeftInHandIndex-Joint-Posi-z"]],
+            ["LeftHandIndex1", "LeftHandIndex1", 44, 43, ["LeftHandIndex1-Joint-Posi-x", "LeftHandIndex1-Joint-Posi-y", "LeftHandIndex1-Joint-Posi-z"]],
+            ["LeftHandIndex2", "LeftHandIndex2", 45, 44, ["LeftHandIndex2-Joint-Posi-x", "LeftHandIndex2-Joint-Posi-y", "LeftHandIndex2-Joint-Posi-z"]],
+            ["LeftHandIndex3", "LeftHandIndex3", 46, 45, ["LeftHandIndex3-Joint-Posi-x", "LeftHandIndex3-Joint-Posi-y", "LeftHandIndex3-Joint-Posi-z"]],
+            ["LeftInHandMiddle", "LeftInHandMiddle", 47, 39, ["LeftInHandMiddle-Joint-Posi-x", "LeftInHandMiddle-Joint-Posi-y", "LeftInHandMiddle-Joint-Posi-z"]],
+            ["LeftHandMiddle1", "LeftHandMiddle1", 48, 47, ["LeftHandMiddle1-Joint-Posi-x", "LeftHandMiddle1-Joint-Posi-y", "LeftHandMiddle1-Joint-Posi-z"]],
+            ["LeftHandMiddle2", "LeftHandMiddle2", 49, 48, ["LeftHandMiddle2-Joint-Posi-x", "LeftHandMiddle2-Joint-Posi-y", "LeftHandMiddle2-Joint-Posi-z"]],
+            ["LeftHandMiddle3", "LeftHandMiddle3", 50, 49, ["LeftHandMiddle3-Joint-Posi-x", "LeftHandMiddle3-Joint-Posi-y", "LeftHandMiddle3-Joint-Posi-z"]],
+            ["LeftInHandRing", "LeftInHandRing", 51, 39, ["LeftInHandRing-Joint-Posi-x", "LeftInHandRing-Joint-Posi-y", "LeftInHandRing-Joint-Posi-z"]],
+            ["LeftHandRing1", "LeftHandRing1", 52, 51, ["LeftHandRing1-Joint-Posi-x", "LeftHandRing1-Joint-Posi-y", "LeftHandRing1-Joint-Posi-z"]],
+            ["LeftHandRing2", "LeftHandRing2", 53, 52, ["LeftHandRing2-Joint-Posi-x", "LeftHandRing2-Joint-Posi-y", "LeftHandRing2-Joint-Posi-z"]],
+            ["LeftHandRing3", "LeftHandRing3", 54, 53, ["LeftHandRing3-Joint-Posi-x", "LeftHandRing3-Joint-Posi-y", "LeftHandRing3-Joint-Posi-z"]],
+            ["LeftInHandPinky", "LeftInHandPinky", 55, 39, ["LeftInHandPinky-Joint-Posi-x", "LeftInHandPinky-Joint-Posi-y", "LeftInHandPinky-Joint-Posi-z"]],
+            ["LeftHandPinky1", "LeftHandPinky1", 56, 55, ["LeftHandPinky1-Joint-Posi-x", "LeftHandPinky1-Joint-Posi-y", "LeftHandPinky1-Joint-Posi-z"]],
+            ["LeftHandPinky2", "LeftHandPinky2", 57, 56, ["LeftHandPinky2-Joint-Posi-x", "LeftHandPinky2-Joint-Posi-y", "LeftHandPinky2-Joint-Posi-z"]],
+            ["LeftHandPinky3", "LeftHandPinky3", 58, 57, ["LeftHandPinky3-Joint-Posi-x", "LeftHandPinky3-Joint-Posi-y", "LeftHandPinky3-Joint-Posi-z"]],
+        ];
+
+        const boneConnections = skeletonDefinition.filter(bone => bone[3] !== -1).map(bone => [bone[2], bone[3]]);
+        var allColumns = [];
+        skeletonDefinition.forEach(bone => allColumns.push(...bone[4]));
+
+        // ----------------------------------------------------
+        // 2. Three.js 场景初始化
+        // ----------------------------------------------------
+        var scene, camera, renderer, controls;
+        var jointMeshes = [], boneMeshes = [];
+        var gridHelper, axesHelper;
+
+        var motionData = [], totalFrames = 0, currentFrame = 0, isPlaying = false, lastTimestamp = 0;
+        var analysisResults = { velocitiesLeft: [], velocitiesRight: [], tilts: [], directions: [] };
+
+        function initScene() {
+            const container = document.getElementById('visualization-container');
+            if (!container) return;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x05070a);
+            
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(3, 1.8, 3.5);
+            
+            try {
+                renderer = new THREE.WebGLRenderer({ 
+                    antialias: true, 
+                    preserveDrawingBuffer: true,
+                    powerPreference: "high-performance" 
+                });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.shadowMap.enabled = true; 
+                container.appendChild(renderer.domElement);
+            } catch (e) {
+                console.error("WebGL 启动失败:", e);
+                return;
+            }
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target.set(0, 0.9, 0);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.update();
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+            const spotLight = new THREE.SpotLight(0xffffff, 1.2);
+            spotLight.position.set(5, 15, 10);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
+            
+            axesHelper = new THREE.AxesHelper(AXES_HELPER_SCALE);
+            axesHelper.position.set(-1.5, 0, -1.5); 
+            scene.add(axesHelper); 
+
+            window.addEventListener('resize', onWindowResize, false);
+            initCharts();
+            animate(0);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('visualization-container');
+            if (!container || !renderer) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // ----------------------------------------------------
+        // 3. 图表配置与初始化
+        // ----------------------------------------------------
+
+        function initCharts() {
+            const chartStyles = (x, y) => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: x, color: '#64748b', font: { size: 10, weight: 'bold' } }, ticks: { color: '#475569', font: { size: 9 } }, grid: { color: '#1e293b' } },
+                    y: { title: { display: true, text: y, color: '#64748b', font: { size: 10, weight: 'bold' } }, grid: { color: '#1e293b' }, ticks: { color: '#475569', font: { size: 9 } } }
+                },
+                plugins: { 
+                    legend: { 
+                        display: true, 
+                        position: 'top', 
+                        align: 'end',
+                        labels: { color: '#94a3b8', boxWidth: 12, font: { size: 10 } } 
+                    } 
+                },
+                animation: false
+            });
+
+            const vCtx = document.getElementById('velocityChart');
+            const tCtx = document.getElementById('tiltChart');
+            const rCtx = document.getElementById('roseChart');
+
+            if (vCtx) {
+                charts.velocity = new Chart(vCtx, {
+                    type: 'line',
+                    data: { 
+                        labels: [], 
+                        datasets: [
+                            { label: 'Left Shank', data: [], borderColor: '#10b981', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 },
+                            { label: 'Right Shank', data: [], borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 }
+                        ] 
+                    },
+                    options: chartStyles('Frame Index', 'Angular Velocity (rad/s)'),
+                    plugins: [{ id: 'vline', afterDraw: drawVerticalLine }]
+                });
+            }
+
+            if (tCtx) {
+                charts.tilt = new Chart(tCtx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ label: 'Trunk Tilt', data: [], borderColor: '#00e5ff', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: 'rgba(0, 229, 255, 0.05)', tension: 0.1 }] },
+                    options: chartStyles('Frame Index', 'Tilt Angle (Degrees)'),
+                    plugins: [{ id: 'vline', afterDraw: drawVerticalLine }]
+                });
+            }
+
+            if (rCtx) {
+                charts.rose = new Chart(rCtx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['Front', 'F-Right', 'Right', 'B-Right', 'Back', 'B-Left', 'Left', 'F-Left'],
+                        datasets: [{ data: Array(8).fill(0), backgroundColor: ['#ef4444aa', '#f59e0baa', '#10b981aa', '#06b6d4aa', '#00e5ffaa', '#8b5cf6aa', '#ec4899aa', '#f43f5eaa'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { r: { grid: { color: '#1e293b' }, angleLines: { color: '#1e293b' }, ticks: { display: false } } },
+                        plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 } } } }
+                    }
+                });
+            }
+        }
+
+        function drawVerticalLine(chart) {
+            if (totalFrames === 0 || !chart.scales.x) return;
+            const ctx = chart.ctx;
+            const x = chart.scales.x.getPixelForValue(currentFrame);
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(x, chart.chartArea.top);
+            ctx.lineTo(x, chart.chartArea.bottom);
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'rgba(244, 63, 94, 0.8)';
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // ----------------------------------------------------
+        // 4. 数据处理与分析逻辑
+        // ----------------------------------------------------
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                parseCSV(e.target.result);
+                performAnalysis();
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('status-display').textContent = `Loaded: ${file.name}`;
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) return;
+            const header = lines[0].split(',').map(h => h.trim());
+            const colIndices = allColumns.map(col => header.indexOf(col));
+
+            motionData = [];
+            let minC = new THREE.Vector3(Infinity, Infinity, Infinity), maxC = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                const framePos = new Array(skeletonDefinition.length);
+                let valid = false;
+                for (let j = 0; j < skeletonDefinition.length; j++) {
+                    const idxs = [colIndices[j*3], colIndices[j*3+1], colIndices[j*3+2]];
+                    if (idxs[0] !== -1 && !isNaN(values[idxs[0]])) {
+                        const p = new THREE.Vector3(values[idxs[0]], values[idxs[1]], values[idxs[2]]);
+                        minC.min(p); maxC.max(p);
+                        framePos[j] = p;
+                        valid = true;
+                    }
+                }
+                if (valid) motionData.push(framePos);
+            }
+            
+            totalFrames = motionData.length;
+            if (totalFrames > 0) {
+                const center = minC.clone().add(maxC).multiplyScalar(0.5);
+                const scale = 1.8 / (maxC.y - minC.y || 1); 
+                motionData.forEach(f => f.forEach(p => p && p.sub(center).multiplyScalar(scale).add(new THREE.Vector3(0, 0.9, 0))));
+
+                setupSkeletonMeshes();
+                const slider = document.getElementById('frameSlider');
+                slider.max = totalFrames - 1; slider.disabled = false;
+                document.getElementById('totalFramesDisplay').textContent = totalFrames;
+                document.getElementById('playPauseButton').disabled = false;
+                document.getElementById('resetButton').disabled = false;
+                document.getElementById('exportGifButton').disabled = false;
+                currentFrame = 0;
+                isPlaying = true;
+            }
+        }
+
+        function setupSkeletonMeshes() {
+            jointMeshes.forEach(m => scene.remove(m)); boneMeshes.forEach(m => scene.remove(m));
+            if (gridHelper) scene.remove(gridHelper);
+            if (trajectoryLines.left) scene.remove(trajectoryLines.left);
+            if (trajectoryLines.right) scene.remove(trajectoryLines.right);
+            
+            jointMeshes = []; boneMeshes = [];
+
+            const mat = new THREE.MeshStandardMaterial({ 
+                color: SKELETON_COLOR, 
+                emissive: SKELETON_COLOR, 
+                emissiveIntensity: 0.6, 
+                metalness: 0.9, 
+                roughness: 0.1 
+            });
+
+            skeletonDefinition.forEach((bone, i) => {
+                const r = (bone[0].includes("Hand") || bone[0].includes("Foot") || bone[0].includes("Index") || bone[0].includes("Pinky")) ? JOINT_RADIUS * 0.5 : JOINT_RADIUS;
+                const m = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 12), mat);
+                m.castShadow = true; scene.add(m); jointMeshes.push(m);
+            });
+
+            boneConnections.forEach(() => {
+                const m = new THREE.Mesh(new THREE.CylinderGeometry(BONE_RADIUS, BONE_RADIUS, 1, 8), mat);
+                m.castShadow = true; scene.add(m); boneMeshes.push(m);
+            });
+
+            const createTrajectory = (color) => {
+                const geo = new THREE.BufferGeometry();
+                const lineMat = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.6 });
+                const line = new THREE.Line(geo, lineMat);
+                line.visible = document.getElementById('trajectoryVisibility').checked;
+                scene.add(line);
+                return line;
+            };
+            trajectoryLines.left = createTrajectory(TRAJECTORY_COLOR_LEFT);
+            trajectoryLines.right = createTrajectory(TRAJECTORY_COLOR_RIGHT);
+            
+            gridHelper = new THREE.GridHelper(10, 50, 0x1e293b, 0x0f172a);
+            scene.add(gridHelper);
+            updateSkeleton(currentFrame);
+        }
+
+        const _v = new THREE.Vector3(), _q = new THREE.Quaternion();
+        function updateSkeleton(idx) {
+            if (motionData.length === 0) return;
+            const pos = motionData[idx];
+            if (!pos) return;
+
+            pos.forEach((p, i) => {
+                if (p && jointMeshes[i]) { jointMeshes[i].position.copy(p); jointMeshes[i].visible = true; }
+                else if (jointMeshes[i]) { jointMeshes[i].visible = false; }
+            });
+            boneConnections.forEach(([cIdx, pIdx], i) => {
+                const c = pos[cIdx], p = pos[pIdx];
+                if (c && p && boneMeshes[i]) {
+                    boneMeshes[i].position.copy(p).lerp(c, 0.5);
+                    _v.subVectors(c, p).normalize();
+                    _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), _v);
+                    boneMeshes[i].scale.set(1, c.distanceTo(p), 1);
+                    boneMeshes[i].quaternion.copy(_q);
+                    boneMeshes[i].visible = true;
+                } else if (boneMeshes[i]) { boneMeshes[i].visible = false; }
+            });
+
+            const updatePath = (line, jointIdx) => {
+                const points = [];
+                for(let k=0; k<=idx; k++) {
+                    const p = motionData[k][jointIdx];
+                    if(p) points.push(p.x, p.y, p.z);
+                }
+                line.geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+                line.geometry.attributes.position.needsUpdate = true;
+            };
+            updatePath(trajectoryLines.right, 3); 
+            updatePath(trajectoryLines.left, 6);  
+            
+            if (charts.velocity) charts.velocity.draw(); 
+            if (charts.tilt) charts.tilt.draw();
+        }
+
+        function performAnalysis() {
+            analysisResults = { velocitiesLeft: [0], velocitiesRight: [0], tilts: [], directions: Array(8).fill(0) };
+            for (let i = 0; i < totalFrames; i++) {
+                const frame = motionData[i];
+                const hips = frame[0], spine = frame[9]; 
+                
+                if (hips && spine) {
+                    const trunkVec = new THREE.Vector3().subVectors(spine, hips);
+                    analysisResults.tilts.push(trunkVec.angleTo(new THREE.Vector3(0, 1, 0)) * (180 / Math.PI));
+                    const angle = Math.atan2(trunkVec.x, trunkVec.z);
+                    let bin = Math.round(angle / (Math.PI / 4));
+                    if (bin < 0) bin += 8;
+                    analysisResults.directions[bin % 8]++;
+                }
+
+                if (i > 0) {
+                    const pF = motionData[i-1];
+                    const rKnee = frame[2], rAnkle = frame[3], prK = pF[2], prA = pF[3];
+                    if (rKnee && rAnkle && prK && prA) {
+                        const v1 = new THREE.Vector3().subVectors(rAnkle, rKnee).normalize();
+                        const v2 = new THREE.Vector3().subVectors(prA, prK).normalize();
+                        analysisResults.velocitiesRight.push(v1.angleTo(v2) * FPS);
+                    } else analysisResults.velocitiesRight.push(0);
+
+                    const lKnee = frame[5], lAnkle = frame[6], plK = pF[5], plA = pF[6];
+                    if (lKnee && lAnkle && plK && plA) {
+                        const v1 = new THREE.Vector3().subVectors(lAnkle, lKnee).normalize();
+                        const v2 = new THREE.Vector3().subVectors(plA, plK).normalize();
+                        analysisResults.velocitiesLeft.push(v1.angleTo(v2) * FPS);
+                    } else analysisResults.velocitiesLeft.push(0);
+                }
+            }
+            const labels = Array.from({length: totalFrames}, (_, i) => i);
+            if (charts.velocity) { 
+                charts.velocity.data.labels = labels; 
+                charts.velocity.data.datasets[0].data = analysisResults.velocitiesLeft; 
+                charts.velocity.data.datasets[1].data = analysisResults.velocitiesRight; 
+                charts.velocity.update(); 
+            }
+            if (charts.tilt) { charts.tilt.data.labels = labels; charts.tilt.data.datasets[0].data = analysisResults.tilts; charts.tilt.update(); }
+            if (charts.rose) { charts.rose.data.datasets[0].data = analysisResults.directions; charts.rose.update(); }
+        }
+
+        function animate(ts) {
+            requestAnimationFrame(animate);
+            if (isPlaying && totalFrames > 0) {
+                const delta = ts - lastTimestamp;
+                if (delta >= frameInterval) {
+                    lastTimestamp = ts - (delta % frameInterval);
+                    currentFrame = (currentFrame + 1) % totalFrames;
+                    updateSkeleton(currentFrame); 
+                    if (document.getElementById('frameSlider')) document.getElementById('frameSlider').value = currentFrame;
+                    if (document.getElementById('frame-info')) document.getElementById('frame-info').textContent = `FRAME: ${currentFrame + 1} / ${totalFrames}`;
+                }
+            }
+            if (controls) controls.update(); 
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }
+
+        function handleFrameScrubbing(v) { isPlaying = false; currentFrame = parseInt(v); updateSkeleton(currentFrame); document.getElementById('playPauseText').textContent = 'Play'; }
+        function toggleAnimation() { isPlaying = !isPlaying; document.getElementById('playPauseText').textContent = isPlaying ? 'Pause' : 'Play'; }
+        function resetAnimation() { isPlaying = false; currentFrame = 0; updateSkeleton(0); document.getElementById('playPauseText').textContent = 'Play'; }
+        function toggleAxesVisibility(v) { if(axesHelper) axesHelper.visible = v; }
+        function toggleTrajectoryVisibility(v) { 
+            if(trajectoryLines.left) trajectoryLines.left.visible = v; 
+            if(trajectoryLines.right) trajectoryLines.right.visible = v; 
+        }
+
+        window.onload = initScene;
+    </script>
+</body>
+</html>

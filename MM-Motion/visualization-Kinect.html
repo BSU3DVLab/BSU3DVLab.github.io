@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinect Kinematics 3D Analysis System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <!-- Three.js Core / Three.js 核心库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for interaction / OrbitControls 用于鼠标交互 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        /* Chart container height / 时序图容器高度 */
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        /* 3D Viewer styles / 3D 骨架预览窗口样式 */
+        .skeleton-3d-container { 
+            position: relative; 
+            width: 100%; 
+            height: 60vh; 
+            min-height: 400px;
+            background: #000; 
+            border-radius: 16px;
+            border: 1px solid #374151;
+            overflow: hidden;
+            cursor: move;
+        }
+        /* Custom scrollbar / 自定义滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        
+        /* Glassmorphism panel / 玻璃拟态面板 */
+        .panel-glass {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Header Section / 头部控制区域 -->
+        <header class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-left">
+                <h1 class="text-2xl font-bold text-blue-400">Kinect 3D Kinematics Analysis</h1>
+                <p class="text-gray-400 text-xs">Azure Kinect Standard 32 Joints · Mirror Corrected · Auto Centered</p>
+            </div>
+            
+            <!-- Controls Bar / 交互控制条 -->
+            <div class="flex flex-wrap items-center gap-4 panel-glass p-3 rounded-xl">
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <input type="file" id="csvFile" accept=".csv" class="hidden">
+                        <label for="csvFile" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-bold cursor-pointer transition flex items-center gap-2 text-white text-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            Upload CSV
+                        </label>
+                    </div>
+                    <span id="fileNameDisplay" class="text-[10px] text-gray-400 max-w-[120px] truncate italic">Waiting...</span>
+                </div>
+                
+                <!-- Playback Controls / 播放控制 -->
+                <div id="playbackControls" class="flex items-center gap-3 border-l border-gray-600 pl-4 opacity-50 pointer-events-none">
+                    <button id="playPauseBtn" class="bg-white text-black w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 transition">
+                        <svg id="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                        <svg id="pauseIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                    </button>
+                    <div class="flex flex-col">
+                        <input type="range" id="progressBar" value="0" min="0" step="1" class="w-32 md:w-48 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <div class="flex justify-between text-[10px] text-gray-400 mt-1 font-mono">
+                            <span id="currentTime">0.00s</span>
+                            <span id="duration">0.00s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Target Selection / 目标选择 -->
+                <div class="flex items-center gap-2 border-l border-gray-600 pl-4">
+                    <label class="text-[10px] text-gray-400 uppercase font-bold text-white">Target Joint</label>
+                    <select id="jointSelect" class="bg-gray-800 border border-gray-600 rounded-lg px-2 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none text-white font-medium">
+                        <option value="20">Left Ankle (Joint 20)</option>
+                        <option value="24">Right Ankle (Joint 24)</option>
+                        <option value="18">Left Hip (Joint 18)</option>
+                        <option value="22">Right Hip (Joint 22)</option>
+                        <option value="8">Left Hand (Joint 8)</option>
+                        <option value="15">Right Hand (Joint 15)</option>
+                        <option value="26">Head (Joint 26)</option>
+                        <option value="0">Pelvis (Joint 0)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main 3D Viewer Area / 核心 3D 视图 -->
+        <main class="mb-8 relative">
+            <div id="skeleton3d" class="skeleton-3d-container shadow-2xl">
+                <!-- Three.js Canvas -->
+            </div>
+            
+            <!-- Float UI Info / 悬浮说明 -->
+            <div class="absolute top-4 right-4 flex flex-col gap-2">
+                <button id="resetCamBtn" class="bg-black/60 hover:bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] border border-white/20 transition text-white">
+                    Reset Camera
+                </button>
+                <div class="bg-black/60 backdrop-blur-md p-2 rounded-lg text-[10px] border border-white/20 text-gray-300">
+                    <div class="font-bold mb-1 border-b border-white/10 pb-1">Controls</div>
+                    <div>Left: Rotate</div>
+                    <div>Right: Pan</div>
+                    <div>Wheel: Zoom</div>
+                </div>
+            </div>
+
+            <!-- Bottom Real-time Stat Bar / 底部实时统计 -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 w-full px-6 max-w-4xl">
+                <div class="flex-1 panel-glass p-3 rounded-xl border-l-4 border-blue-500 shadow-xl">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 text-white text-nowrap">Joint Velocity</p>
+                    <p class="text-xl font-mono text-white"><span id="curSpeed">0.000</span> <span class="text-xs text-gray-400">m/s</span></p>
+                </div>
+                <div class="flex-1 panel-glass p-3 rounded-xl border-l-4 border-red-500 shadow-xl">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 text-white text-nowrap">Joint Acceleration</p>
+                    <p class="text-xl font-mono text-white"><span id="curAcc">0.000</span> <span class="text-xs text-gray-400">m/s²</span></p>
+                </div>
+                <div class="flex-1 panel-glass p-3 rounded-xl border-l-4 border-green-500 shadow-xl">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 text-white text-nowrap">Frame ID</p>
+                    <p class="text-xl font-mono text-white"><span id="curFrameId">#0</span></p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Lower Charts Area (Vertical Stack) / 下方图表区域（垂直排列） -->
+        <div class="flex flex-col gap-6">
+            <!-- Velocity Chart -->
+            <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-700 shadow-lg">
+                <h3 class="text-xs font-bold text-blue-400 mb-4 uppercase tracking-wider text-white">Velocity Trend (m/s)</h3>
+                <div class="chart-container">
+                    <canvas id="speedChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Acceleration Chart -->
+            <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-700 shadow-lg">
+                <h3 class="text-xs font-bold text-red-400 mb-4 uppercase tracking-wider text-white">Acceleration Analysis (m/s²)</h3>
+                <div class="chart-container">
+                    <canvas id="accChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Displacement Chart -->
+            <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-700 shadow-lg">
+                <h3 class="text-xs font-bold text-green-400 mb-4 uppercase tracking-wider text-white">Spatial Displacement Coordinates (m)</h3>
+                <div class="chart-container">
+                    <canvas id="posChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global State / 全局状态 ---
+        let frames = [];
+        let charts = {};
+        let currentIndex = 0;
+        let isPlaying = false;
+        let animationId = null;
+        let lastTimestamp = 0;
+
+        // --- Three.js Variables / Three.js 变量 ---
+        let scene, camera, renderer, controls;
+        let jointMeshes = [];
+        let boneLines = [];
+        let highLightBall; 
+
+        // Azure Kinect skeleton connections topology / 骨架连线关系
+        const connections = [
+            [26, 3], [3, 2], [2, 1], [1, 0], 
+            [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [8, 10],
+            [3, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [15, 17],
+            [0, 18], [18, 19], [19, 20], [20, 21],
+            [0, 22], [22, 23], [23, 24], [24, 25],
+            [26, 27], [27, 28], [27, 30] 
+        ];
+
+        // --- Initialize Three.js / 初始化 Three.js ---
+        function initThree() {
+            const container = document.getElementById('skeleton3d');
+            const w = container.offsetWidth;
+            const h = container.offsetHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050505);
+
+            camera = new THREE.PerspectiveCamera(45, w / h, 1, 40000);
+            camera.position.set(0, 1000, 3000); 
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.1;
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const pointLight = new THREE.PointLight(0xffffff, 0.8);
+            pointLight.position.set(0, 5000, 5000);
+            scene.add(pointLight);
+
+            // Ground grid fixed at Y=0 / 地面辅助线固定在 Y=0
+            const gridHelper = new THREE.GridHelper(10000, 40, 0x333333, 0x111111);
+            gridHelper.position.y = 0; 
+            scene.add(gridHelper);
+
+            const sphereGeo = new THREE.SphereGeometry(20, 16, 16);
+            for (let i = 0; i < 32; i++) {
+                const mat = new THREE.MeshPhongMaterial({ color: i === 26 ? 0xffdd00 : 0xeeeeee });
+                const mesh = new THREE.Mesh(sphereGeo, mat);
+                mesh.visible = false;
+                scene.add(mesh);
+                jointMeshes.push(mesh);
+            }
+
+            const hlGeo = new THREE.SphereGeometry(55, 32, 32);
+            const hlMat = new THREE.MeshBasicMaterial({ 
+                color: 0xff3333, 
+                transparent: true, 
+                opacity: 0.4,
+                wireframe: true 
+            });
+            highLightBall = new THREE.Mesh(hlGeo, hlMat);
+            highLightBall.visible = false;
+            scene.add(highLightBall);
+
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x3b82f6, linewidth: 3 });
+            connections.forEach(() => {
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+                const line = new THREE.Line(geometry, lineMat);
+                line.visible = false;
+                scene.add(line);
+                boneLines.push(line);
+            });
+
+            function animate(time) {
+                requestAnimationFrame(animate);
+                if(highLightBall.visible) {
+                    const s = 1 + Math.sin(time * 0.008) * 0.15;
+                    highLightBall.scale.set(s, s, s);
+                }
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate(0);
+        }
+
+        // --- Initialize Charts / 初始化图表 ---
+        function initCharts() {
+            const vLine = {
+                id: 'vLine',
+                afterDraw: (chart) => {
+                    if (chart.tooltip?._active?.length || (!isPlaying && currentIndex === 0)) return;
+                    const ctx = chart.ctx;
+                    const x = chart.scales.x.getPixelForValue(currentIndex);
+                    if (x < chart.chartArea.left || x > chart.chartArea.right) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, chart.chartArea.top);
+                    ctx.lineTo(x, chart.chartArea.bottom);
+                    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)'; ctx.stroke();
+                    ctx.restore();
+                }
+            };
+
+            const baseCfg = (col) => ({
+                type: 'line', plugins: [vLine],
+                options: {
+                    responsive: true, maintainAspectRatio: false, animation: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { display: false }, 
+                        y: { grid: { color: 'rgba(75, 85, 99, 0.2)' }, ticks: { color: '#9ca3af', font: {size: 10} } } 
+                    }
+                }
+            });
+
+            charts.speed = new Chart(document.getElementById('speedChart'), {
+                ...baseCfg('#3b82f6'),
+                data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }] }
+            });
+            charts.acc = new Chart(document.getElementById('accChart'), {
+                ...baseCfg('#ef4444'),
+                data: { labels: [], datasets: [{ data: [], borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 }] }
+            });
+            charts.pos = new Chart(document.getElementById('posChart'), {
+                ...baseCfg('#10b981'),
+                options: { ...baseCfg('#10b981').options, plugins: { legend: { display: true, labels: { color: '#9ca3af', boxWidth: 8, font: {size: 10} } } } },
+                data: { labels: [], datasets: [
+                    { label: 'X', data: [], borderColor: '#ef4444', borderWidth: 1, pointRadius: 0 },
+                    { label: 'Y', data: [], borderColor: '#10b981', borderWidth: 1, pointRadius: 0 },
+                    { label: 'Z', data: [], borderColor: '#3b82f6', borderWidth: 1, pointRadius: 0 }
+                ]}
+            });
+        }
+
+        // --- Core Rendering Logic / 数据渲染逻辑 ---
+        function updateThreeSkeleton(idx) {
+            const frame = frames[idx];
+            if (!frame) return;
+
+            const targetId = parseInt(document.getElementById('jointSelect').value);
+            
+            // --- Auto-centering Logic / 自动居中逻辑 ---
+            // Use Pelvis (Joint 0) as reference to center the character on X and Z axis
+            // 使用盆骨（关节 0）作为参考点，将人物居中对齐到 X 轴和 Z 轴的原点
+            const refX = frame[`joint_0_x`] || 0;
+            const refZ = frame[`joint_0_z`] || 0;
+
+            // Calculate vertical offset to keep feet on ground
+            // 计算垂直偏移，确保脚底贴地
+            let minY = Infinity;
+            for (let i = 0; i < 32; i++) {
+                const y = frame[`joint_${i}_y`];
+                if (y !== undefined) {
+                    if (-y < minY) minY = -y;
+                }
+            }
+            const yOffset = -minY;
+
+            for (let i = 0; i < 32; i++) {
+                const x = frame[`joint_${i}_x`], y = frame[`joint_${i}_y`], z = frame[`joint_${i}_z`];
+                if (x !== undefined) {
+                    // Apply mirroring, centering (relative to ref), and ground alignment
+                    // 应用镜像、居中偏移（相对于参考点）以及地面辅助对齐
+                    const posX = -(x - refX); // Center X and Mirror
+                    const posY = -y + yOffset; 
+                    const posZ = z - refZ;    // Center Z
+
+                    jointMeshes[i].position.set(posX, posY, posZ);
+                    jointMeshes[i].visible = true;
+                    
+                    if (i === targetId) {
+                        highLightBall.position.set(posX, posY, posZ);
+                        highLightBall.visible = true;
+                    }
+                } else { jointMeshes[i].visible = false; }
+            }
+
+            // Update skeleton lines / 更新骨架线条
+            connections.forEach((conn, i) => {
+                const j1 = jointMeshes[conn[0]], j2 = jointMeshes[conn[1]];
+                if (j1 && j2 && j1.visible && j2.visible) {
+                    const posAttr = boneLines[i].geometry.attributes.position;
+                    posAttr.array[0] = j1.position.x; posAttr.array[1] = j1.position.y; posAttr.array[2] = j1.position.z;
+                    posAttr.array[3] = j2.position.x; posAttr.array[4] = j2.position.y; posAttr.array[5] = j2.position.z;
+                    posAttr.needsUpdate = true;
+                    boneLines[i].visible = true;
+                } else { if(boneLines[i]) boneLines[i].visible = false; }
+            });
+
+            // Focus camera target on centered pelvis
+            // 视角旋转中心锁定在居中后的盆骨位置
+            if (jointMeshes[0].visible) {
+                const targetPos = new THREE.Vector3(0, jointMeshes[0].position.y, 0);
+                controls.target.lerp(targetPos, 0.2); 
+            }
+        }
+
+        // --- Physics Calculation Logic / 物理量计算逻辑 ---
+        function calculatePhysics() {
+            const jointId = document.getElementById('jointSelect').value;
+            const labels = frames.map(f => f.frame_id);
+            const speeds = [0], accs = [0], pX = [], pY = [], pZ = [];
+            const sX = frames[0][`joint_${jointId}_x`]||0, sY = frames[0][`joint_${jointId}_y`]||0, sZ = frames[0][jointId+'_z']||0;
+
+            for (let i = 1; i < frames.length; i++) {
+                const f1 = frames[i-1], f2 = frames[i];
+                const dt = (f2.timestamp_usec - f1.timestamp_usec) / 1000000;
+                
+                const x1 = f1[`joint_${jointId}_x`]||0, y1 = f1[`joint_${jointId}_y`]||0, z1 = f1[`joint_${jointId}_z`]||0;
+                const x2 = f2[`joint_${jointId}_x`]||0, y2 = f2[`joint_${jointId}_y`]||0, z2 = f2[`joint_${jointId}_z`]||0;
+
+                const dist = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2) + Math.pow(z2-z1, 2)) / 1000;
+                const v = dt > 0 ? dist / dt : 0;
+                speeds.push(v);
+                accs.push(dt > 0 ? Math.abs(v - (speeds[i-1]||0))/dt : 0);
+                
+                // Keep relative chart data consistent with raw sensor offset calculation
+                pX.push((-f2[`joint_${jointId}_x`] - (-sX))/1000);
+                pY.push((-f2[`joint_${jointId}_y`] - (-sY))/1000);
+                pZ.push((f2[`joint_${jointId}_z`]-sZ)/1000);
+            }
+
+            charts.speed.data.labels = labels; charts.speed.data.datasets[0].data = speeds; charts.speed.update('none');
+            charts.acc.data.labels = labels; charts.acc.data.datasets[0].data = accs; charts.acc.update('none');
+            charts.pos.data.labels = labels;
+            charts.pos.data.datasets[0].data = pX; charts.pos.data.datasets[1].data = pY; charts.pos.data.datasets[2].data = pZ;
+            charts.pos.update('none');
+        }
+
+        // --- Main Playback Loop / 播放循环主控 ---
+        function playbackLoop(timestamp) {
+            if (!isPlaying) return;
+            if (timestamp - lastTimestamp > 33) {
+                if (currentIndex >= frames.length - 1) {
+                    currentIndex = 0; // Infinite Loop / 自动循环播放
+                } else {
+                    currentIndex++;
+                }
+                updateUI();
+                lastTimestamp = timestamp;
+            }
+            animationId = requestAnimationFrame(playbackLoop);
+        }
+
+        function updateUI() {
+            const frame = frames[currentIndex];
+            if (!frame) return;
+            document.getElementById('progressBar').value = currentIndex;
+            document.getElementById('curFrameId').innerText = `#${frame.frame_id}`;
+            document.getElementById('currentTime').innerText = (frame.timestamp_usec / 1000000).toFixed(2) + "s";
+            document.getElementById('curSpeed').innerText = (charts.speed.data.datasets[0].data[currentIndex]||0).toFixed(3);
+            document.getElementById('curAcc').innerText = (charts.acc.data.datasets[0].data[currentIndex]||0).toFixed(3);
+            Object.values(charts).forEach(c => c.update('none'));
+            updateThreeSkeleton(currentIndex);
+        }
+
+        function togglePlay(state) {
+            isPlaying = state;
+            document.getElementById('playIcon').classList.toggle('hidden', isPlaying);
+            document.getElementById('pauseIcon').classList.toggle('hidden', !isPlaying);
+            if (isPlaying) { lastTimestamp = performance.now(); animationId = requestAnimationFrame(playbackLoop); }
+            else { cancelAnimationFrame(animationId); }
+        }
+
+        // --- Event Listeners / 事件监听 ---
+        document.getElementById('csvFile').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const display = document.getElementById('fileNameDisplay');
+            if (display) display.innerText = file.name;
+
+            Papa.parse(file, {
+                header: true, dynamicTyping: true, skipEmptyLines: true,
+                complete: (results) => {
+                    frames = results.data; currentIndex = 0;
+                    document.getElementById('progressBar').max = frames.length - 1;
+                    document.getElementById('duration').innerText = (frames[frames.length-1].timestamp_usec / 1000000).toFixed(2) + "s";
+                    document.getElementById('playbackControls').classList.remove('opacity-50', 'pointer-events-none');
+                    calculatePhysics(); updateUI(); togglePlay(true);
+                }
+            });
+        };
+
+        document.getElementById('playPauseBtn').onclick = () => togglePlay(!isPlaying);
+        document.getElementById('progressBar').oninput = (e) => { currentIndex = parseInt(e.target.value); togglePlay(false); updateUI(); };
+        document.getElementById('jointSelect').onchange = () => { calculatePhysics(); updateUI(); };
+        document.getElementById('resetCamBtn').onclick = () => {
+            if(jointMeshes[0].visible) {
+                const p = jointMeshes[0].position;
+                camera.position.set(p.x, p.y + 1000, p.z + 3000);
+                controls.target.copy(p);
+            } else {
+                camera.position.set(0, 1000, 3000);
+                controls.target.set(0, 0, 0);
+            }
+            controls.update();
+        };
+
+        window.onload = () => { 
+            initThree(); 
+            initCharts(); 
+            window.addEventListener('resize', () => {
+                const container = document.getElementById('skeleton3d');
+                camera.aspect = container.offsetWidth / container.offsetHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.offsetWidth, container.offsetHeight);
+            });
+        };
+    </script>
+</body>
+</html>

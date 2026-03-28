@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantar Pressure Data Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .main-display {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 650px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .foot-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background-color: #ffffff;
+        }
+        .heatmap-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .sensor {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #333;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .sensor:hover {
+            border-color: #ff0000;
+            border-width: 2px;
+            transform: scale(1.1);
+            z-index: 100;
+        }
+        .sensor.dragging {
+            border-color: #00ff00;
+            border-width: 3px;
+            z-index: 1000;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+        .controls button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        #play-btn { background-color: #4CAF50; color: white; }
+        #pause-btn { background-color: #ff9800; color: white; }
+        #reset-btn { background-color: #f44336; color: white; }
+        #edit-mode-btn { background-color: #9C27B0; color: white; }
+        #save-positions-btn { background-color: #607D8B; color: white; }
+        #toggle-sensors-btn { background-color: #3f51b5; color: white; }
+        #toggle-cop-btn { background-color: #009688; color: white; }
+        #time-slider {
+            width: 60%;
+            margin: 0 20px;
+            vertical-align: middle;
+        }
+        #time-display {
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .file-upload {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Hide the default browser file input */
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        /* Custom file upload button style */
+        .custom-file-upload {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .custom-file-upload:hover {
+            background-color: #d0d0d0;
+        }
+        #file-name-display {
+            margin: 0 15px;
+            font-size: 14px;
+            color: #666;
+            min-width: 120px;
+            text-align: left;
+        }
+        .file-upload button {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        .legend {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .legend-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .legend-bar {
+            width: 25px;
+            height: 200px;
+            background: linear-gradient(to top, 
+                rgb(41, 51, 117) 0%,      /* 0: 深蓝 */
+                rgb(84, 158, 191) 20%,    /* 400: 青蓝 */
+                rgb(132, 193, 115) 40%,   /* 800: 绿 */
+                rgb(222, 215, 86) 60%,    /* 1200: 黄 */
+                rgb(216, 117, 50) 80%,    /* 1600: 橙 */
+                rgb(159, 39, 36) 100%);   /* 2000: 深红 */
+            border: 1px solid #333;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+        .legend-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 5px;
+        }
+        .edit-mode-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 0, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            font-weight: bold;
+            z-index: 2000;
+        }
+        .edit-mode-info.active {
+            display: block;
+        }
+        .foot-container.hide-sensors .sensor {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Plantar Pressure Data Visualization</h1>
+        
+        <div class="file-upload">
+            <label for="file-input" class="custom-file-upload">Choose File</label>
+            <input type="file" id="file-input" accept=".csv">
+            <span id="file-name-display">No file chosen</span>
+            <button id="load-btn">Load CSV File</button>
+        </div>
+        
+        <div class="main-display">
+            <!-- Edit Mode Info -->
+            <div class="edit-mode-info" id="edit-mode-info">
+                Edit Mode: Drag edge sensors to dynamically reshape the foot outline
+            </div>
+            
+            <!-- Foot Container -->
+            <div class="foot-container" id="foot-container">
+                <canvas class="heatmap-canvas" id="heatmap-canvas"></canvas>
+            </div>
+            
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-title">Pressure (g)</div>
+                <div style="display: flex; gap: 5px;">
+                    <div class="legend-labels">
+                        <span>2000</span>
+                        <span>1600</span>
+                        <span>1200</span>
+                        <span>800</span>
+                        <span>400</span>
+                        <span>0</span>
+                    </div>
+                    <div class="legend-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="edit-mode-btn">Edit Mode</button>
+            <button id="save-positions-btn">Save Positions</button>
+            <button id="toggle-sensors-btn">Hide Sensors</button>
+            <button id="toggle-cop-btn">Hide CoP</button>
+            <button id="play-btn">Play</button>
+            <button id="pause-btn">Pause</button>
+            <button id="reset-btn">Reset</button>
+            <input type="range" id="time-slider" min="0" max="100" value="0" step="1">
+            <span id="time-display">Time: 0.00s</span>
+        </div>
+    </div>
+
+    <script>
+        // 传感器位置
+        let rightSensorPositions = [
+            {id: 'R1', x: 728, y: 38}, {id: 'R2', x: 764, y: 21}, {id: 'R3', x: 795, y: 28}, {id: 'R4', x: 822, y: 48},
+            {id: 'R5', x: 719, y: 78}, {id: 'R6', x: 763, y: 71}, {id: 'R7', x: 804, y: 80}, {id: 'R8', x: 846, y: 90}, {id: 'R9', x: 853, y: 131},
+            {id: 'R10', x: 723, y: 120}, {id: 'R11', x: 768, y: 122}, {id: 'R12', x: 810, y: 126}, {id: 'R13', x: 771, y: 165}, {id: 'R14', x: 862, y: 175},
+            {id: 'R15', x: 724, y: 164}, {id: 'R16', x: 785, y: 211}, {id: 'R17', x: 820, y: 213}, {id: 'R18', x: 858, y: 219}, {id: 'R19', x: 816, y: 173},
+            {id: 'R20', x: 747, y: 208}, {id: 'R21', x: 753, y: 249}, {id: 'R22', x: 786, y: 253}, {id: 'R23', x: 824, y: 257}, {id: 'R24', x: 861, y: 259},
+            {id: 'R25', x: 753, y: 347}, {id: 'R26', x: 762, y: 299}, {id: 'R27', x: 790, y: 302}, {id: 'R28', x: 818, y: 304}, {id: 'R29', x: 849, y: 307},
+            {id: 'R30', x: 754, y: 394}, {id: 'R31', x: 784, y: 399}, {id: 'R32', x: 785, y: 350}, {id: 'R33', x: 815, y: 350}, {id: 'R34', x: 849, y: 354},
+            {id: 'R35', x: 751, y: 439}, {id: 'R36', x: 814, y: 403}, {id: 'R37', x: 781, y: 445}, {id: 'R38', x: 811, y: 449}, {id: 'R39', x: 843, y: 402},
+            {id: 'R40', x: 749, y: 483}, {id: 'R41', x: 777, y: 494}, {id: 'R42', x: 807, y: 496}, {id: 'R43', x: 836, y: 492}, {id: 'R44', x: 841, y: 447},
+            {id: 'R45', x: 749, y: 526}, {id: 'R46', x: 770, y: 547}, {id: 'R47', x: 804, y: 550}, {id: 'R48', x: 833, y: 534}
+        ];
+
+        let leftSensorPositions = [
+            {id: 'L1', x: 498, y: 48}, {id: 'L2', x: 530, y: 29}, {id: 'L3', x: 560, y: 18}, {id: 'L4', x: 597, y: 36},
+            {id: 'L5', x: 480, y: 91}, {id: 'L6', x: 517, y: 80}, {id: 'L7', x: 562, y: 73}, {id: 'L8', x: 599, y: 78}, {id: 'L9', x: 603, y: 120},
+            {id: 'L10', x: 473, y: 131}, {id: 'L11', x: 510, y: 126}, {id: 'L12', x: 558, y: 120}, {id: 'L13', x: 550, y: 165}, {id: 'L14', x: 593, y: 162},
+            {id: 'L15', x: 463, y: 215}, {id: 'L16', x: 501, y: 213}, {id: 'L17', x: 540, y: 208}, {id: 'L18', x: 505, y: 170}, {id: 'L19', x: 579, y: 204},
+            {id: 'L20', x: 466, y: 175}, {id: 'L21', x: 535, y: 253}, {id: 'L22', x: 464, y: 259}, {id: 'L23', x: 497, y: 256}, {id: 'L24', x: 574, y: 250},
+            {id: 'L25', x: 475, y: 354}, {id: 'L26', x: 474, y: 307}, {id: 'L27', x: 511, y: 302}, {id: 'L28', x: 536, y: 300}, {id: 'L29', x: 569, y: 297},
+            {id: 'L30', x: 483, y: 402}, {id: 'L31', x: 514, y: 401}, {id: 'L32', x: 509, y: 351}, {id: 'L33', x: 537, y: 346}, {id: 'L34', x: 568, y: 345},
+            {id: 'L35', x: 543, y: 398}, {id: 'L36', x: 575, y: 392}, {id: 'L37', x: 575, y: 439}, {id: 'L38', x: 514, y: 448}, {id: 'L39', x: 481, y: 450},
+            {id: 'L40', x: 485, y: 491}, {id: 'L41', x: 522, y: 496}, {id: 'L42', x: 553, y: 491}, {id: 'L43', x: 581, y: 482}, {id: 'L44', x: 547, y: 445},
+            {id: 'L45', x: 492, y: 533}, {id: 'L46', x: 521, y: 548}, {id: 'L47', x: 557, y: 545}, {id: 'L48', x: 580, y: 525}
+        ];
+
+        const rightFootPerimeter = ['R1','R2','R3','R4','R8','R9','R14','R18','R24','R29','R34','R39','R44','R48','R47','R46','R45','R40','R35','R30','R25','R21','R20','R15','R10','R5'];
+        const leftFootPerimeter = ['L4','L3','L2','L1','L5','L10','L20','L15','L22','L26','L25','L30','L39','L40','L45','L46','L47','L48','L43','L37','L36','L34','L29','L24','L19','L14','L9','L8'];
+
+        let pressureData = [];
+        let currentFrame = 0;
+        let isPlaying = false;
+        let playInterval;
+        let editMode = false;
+        let sensorsVisible = true;
+        let showCoP = true;
+        let draggingElement = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let heatmapCanvas = null;
+        let heatmapCtx = null;
+        let maskCanvas = null;
+        let maskCtx = null;
+        let tempCanvas = null;
+        let tempCtx = null;
+
+        const COLOR_STOPS = [
+            { v: 0.0, c: [41, 51, 117] },
+            { v: 0.2, c: [84, 158, 191] },
+            { v: 0.4, c: [132, 193, 115] },
+            { v: 0.6, c: [222, 215, 86] },
+            { v: 0.8, c: [216, 117, 50] },
+            { v: 1.0, c: [159, 39, 36] }
+        ];
+
+        function interpolateColor(intensity) {
+            intensity = Math.max(0, Math.min(1, intensity));
+            for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
+                if (intensity >= COLOR_STOPS[i].v && intensity <= COLOR_STOPS[i+1].v) {
+                    const range = COLOR_STOPS[i+1].v - COLOR_STOPS[i].v;
+                    const ratio = (intensity - COLOR_STOPS[i].v) / range;
+                    const r = Math.round(COLOR_STOPS[i].c[0] + ratio * (COLOR_STOPS[i+1].c[0] - COLOR_STOPS[i].c[0]));
+                    const g = Math.round(COLOR_STOPS[i].c[1] + ratio * (COLOR_STOPS[i+1].c[1] - COLOR_STOPS[i].c[1]));
+                    const b = Math.round(COLOR_STOPS[i].c[2] + ratio * (COLOR_STOPS[i+1].c[2] - COLOR_STOPS[i].c[2]));
+                    return { r, g, b };
+                }
+            }
+            return { r: 255, g: 0, b: 0 };
+        }
+
+        function getHeatmapColor(intensity) {
+            return interpolateColor(intensity);
+        }
+
+        function initCanvas() {
+            heatmapCanvas = document.getElementById('heatmap-canvas');
+            const container = document.getElementById('foot-container');
+            const w = container.offsetWidth;
+            const h = container.offsetHeight;
+            
+            heatmapCanvas.width = w;
+            heatmapCanvas.height = h;
+            heatmapCtx = heatmapCanvas.getContext('2d');
+            
+            if (!tempCanvas) {
+                tempCanvas = document.createElement('canvas');
+                tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+            }
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            
+            if (!maskCanvas) {
+                maskCanvas = document.createElement('canvas');
+                maskCtx = maskCanvas.getContext('2d');
+            }
+            maskCanvas.width = w;
+            maskCanvas.height = h;
+        }
+
+        function defineSmoothPath(ctx, points) {
+            if (points.length < 3) return;
+            ctx.beginPath();
+            let startX = (points[points.length - 1].x + points[0].x) / 2;
+            let startY = (points[points.length - 1].y + points[0].y) / 2;
+            ctx.moveTo(startX, startY);
+
+            for (let i = 0; i < points.length; i++) {
+                let p1 = points[i];
+                let p2 = points[(i + 1) % points.length];
+                let midX = (p1.x + p2.x) / 2;
+                let midY = (p1.y + p2.y) / 2;
+                ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+            }
+            ctx.closePath();
+        }
+
+        function drawFootBase(ctx, points) {
+            if (points.length === 0) return;
+            defineSmoothPath(ctx, points);
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            
+            ctx.lineWidth = 55; 
+            ctx.strokeStyle = '#cccccc';
+            ctx.stroke();
+            
+            ctx.lineWidth = 51;
+            ctx.strokeStyle = '#f4f6f8';
+            ctx.stroke();
+            ctx.fillStyle = '#f4f6f8';
+            ctx.fill();
+        }
+
+        function drawFootMask(ctx, points) {
+            if (points.length === 0) return;
+            defineSmoothPath(ctx, points);
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            
+            ctx.lineWidth = 51;
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+            ctx.fillStyle = '#000000';
+            ctx.fill();
+        }
+
+        function calculateCoP(dataArray, side) {
+            let sumPx = 0;
+            let sumPy = 0;
+            let sumP = 0;
+            const positions = side === 'right' ? rightSensorPositions : leftSensorPositions;
+            const prefix = side === 'right' ? 'R' : 'L';
+
+            if (!dataArray || dataArray.length === 0) return null;
+
+            dataArray.forEach((val, idx) => {
+                if (val > 5) { 
+                    const pos = positions.find(p => p.id === `${prefix}${idx + 1}`);
+                    if (pos) {
+                        sumPx += val * (pos.x + 17.5);
+                        sumPy += val * (pos.y + 17.5);
+                        sumP += val;
+                    }
+                }
+            });
+
+            if (sumP < 10) return null; 
+            return { x: sumPx / sumP, y: sumPy / sumP };
+        }
+
+        function drawArrow(ctx, p1, p2) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const angle = Math.atan2(dy, dx);
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+            const headlen = 8; 
+            
+            ctx.beginPath();
+            ctx.moveTo(midX, midY); 
+            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 7), midY - headlen * Math.sin(angle - Math.PI / 7));
+            ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 7), midY - headlen * Math.sin(angle + Math.PI / 7));
+            ctx.closePath();
+            
+            ctx.fillStyle = 'rgba(128, 128, 128, 0.9)'; 
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.stroke();
+        }
+
+        function drawCoPTrajectory(ctx, upToFrame, side, lineColor) {
+            if (pressureData.length === 0) return;
+
+            const path = [];
+            // 防越界保护：取当前请求帧数和数据长度的最大安全索引
+            const maxSafeFrame = Math.min(upToFrame, pressureData.length - 1);
+            
+            for (let i = 0; i <= maxSafeFrame; i++) {
+                const frame = pressureData[i];
+                if (!frame) continue; // 额外空数据保护
+                
+                const dataArray = side === 'right' ? (frame.right || []) : (frame.left || []);
+                const cop = calculateCoP(dataArray, side);
+                if (cop) {
+                    path.push(cop);
+                }
+            }
+
+            if (path.length === 0) return;
+
+            ctx.beginPath();
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.moveTo(path[0].x, path[0].y);
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(path[i].x, path[i].y);
+            }
+            ctx.stroke();
+
+            let lastArrowPoint = path[0];
+            for (let i = 0; i < path.length; i++) {
+                ctx.beginPath();
+                ctx.fillStyle = lineColor;
+                ctx.arc(path[i].x, path[i].y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (i > 0) {
+                    const p1 = path[i - 1];
+                    const p2 = path[i];
+                    const dist = Math.hypot(p2.x - lastArrowPoint.x, p2.y - lastArrowPoint.y);
+                    if (dist > 12) { 
+                        drawArrow(ctx, lastArrowPoint, p2);
+                        lastArrowPoint = p2;
+                    }
+                }
+            }
+
+            ctx.fillStyle = '#4CAF50';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(path[0].x - 6, path[0].y - 6, 12, 12);
+            ctx.strokeRect(path[0].x - 6, path[0].y - 6, 12, 12);
+
+            const last = path[path.length - 1];
+            ctx.beginPath();
+            ctx.fillStyle = lineColor;
+            ctx.arc(last.x, last.y, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        function drawHeatmap(frame) {
+            if (!heatmapCtx) return;
+            const width = heatmapCanvas.width;
+            const height = heatmapCanvas.height;
+            
+            heatmapCtx.clearRect(0, 0, width, height);
+            tempCtx.clearRect(0, 0, width, height);
+            maskCtx.clearRect(0, 0, width, height);
+            
+            const rightPts = rightFootPerimeter.map(id => rightSensorPositions.find(p => p.id === id)).filter(p => p).map(p => ({x: p.x + 17.5, y: p.y + 17.5}));
+            const leftPts = leftFootPerimeter.map(id => leftSensorPositions.find(p => p.id === id)).filter(p => p).map(p => ({x: p.x + 17.5, y: p.y + 17.5}));
+
+            drawFootBase(heatmapCtx, rightPts);
+            drawFootBase(heatmapCtx, leftPts);
+
+            drawFootMask(maskCtx, rightPts);
+            drawFootMask(maskCtx, leftPts);
+            
+            const rightData = (frame && frame.right) ? frame.right : [];
+            rightData.forEach((value, index) => {
+                const sensorId = index + 1;
+                const pos = rightSensorPositions.find(p => p.id === `R${sensorId}`);
+                if (pos && value > 0) {
+                    drawHeatPoint(tempCtx, pos.x + 17.5, pos.y + 17.5, value, 80);
+                }
+            });
+            
+            const leftData = (frame && frame.left) ? frame.left : [];
+            leftData.forEach((value, index) => {
+                const sensorId = index + 1;
+                const pos = leftSensorPositions.find(p => p.id === `L${sensorId}`);
+                if (pos && value > 0) {
+                    drawHeatPoint(tempCtx, pos.x + 17.5, pos.y + 17.5, value, 80);
+                }
+            });
+            
+            const imageData = tempCtx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const alpha = data[i + 3];
+                if (alpha > 0) {
+                    const intensity = alpha / 255;
+                    const color = getHeatmapColor(intensity);
+                    data[i] = color.r;
+                    data[i + 1] = color.g;
+                    data[i + 2] = color.b;
+                    data[i + 3] = Math.min(alpha * 2.5, 255);
+                }
+            }
+            tempCtx.putImageData(imageData, 0, 0);
+            
+            tempCtx.globalCompositeOperation = 'destination-in';
+            tempCtx.drawImage(maskCanvas, 0, 0);
+            tempCtx.globalCompositeOperation = 'source-over';
+            
+            heatmapCtx.drawImage(tempCanvas, 0, 0);
+
+            if (showCoP && pressureData.length > 0) {
+                drawCoPTrajectory(heatmapCtx, currentFrame, 'left', '#2196F3'); 
+                drawCoPTrajectory(heatmapCtx, currentFrame, 'right', '#F44336'); 
+            }
+        }
+        
+        function drawHeatPoint(ctx, x, y, value, radius) {
+            const maxValue = 2000;
+            const intensity = Math.min(value / maxValue, 1);
+            const actualRadius = radius * (0.8 + intensity * 0.6);
+            
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, actualRadius);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${intensity})`);
+            gradient.addColorStop(0.3, `rgba(255, 255, 255, ${intensity * 0.8})`);
+            gradient.addColorStop(0.7, `rgba(255, 255, 255, ${intensity * 0.3})`);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, actualRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function initSensors() {
+            const container = document.getElementById('foot-container');
+            const canvas = document.getElementById('heatmap-canvas');
+            container.innerHTML = '';
+            if (canvas) container.appendChild(canvas);
+
+            rightSensorPositions.forEach(pos => createSensorElement(container, pos, 'right'));
+            leftSensorPositions.forEach(pos => createSensorElement(container, pos, 'left'));
+
+            setupDragAndDrop();
+        }
+        
+        function createSensorElement(container, pos, side) {
+            const sensor = document.createElement('div');
+            sensor.className = 'sensor';
+            sensor.id = `${side}-${pos.id}`;
+            sensor.style.left = `${pos.x}px`;
+            sensor.style.top = `${pos.y}px`;
+            sensor.textContent = '0';
+            sensor.dataset.side = side;
+            sensor.dataset.id = pos.id;
+            container.appendChild(sensor);
+        }
+
+        function setupDragAndDrop() {
+            const sensors = document.querySelectorAll('.sensor');
+            sensors.forEach(sensor => {
+                sensor.addEventListener('mousedown', startDrag);
+            });
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+        }
+
+        function startDrag(e) {
+            if (!editMode) return;
+            draggingElement = e.target;
+            const rect = draggingElement.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            draggingElement.classList.add('dragging');
+        }
+
+        function drag(e) {
+            if (!draggingElement || !editMode) return;
+            const container = document.getElementById('foot-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            let newX = e.clientX - containerRect.left - offsetX;
+            let newY = e.clientY - containerRect.top - offsetY;
+            
+            newX = Math.max(0, Math.min(newX, containerRect.width - 35));
+            newY = Math.max(0, Math.min(newY, containerRect.height - 35));
+            
+            draggingElement.style.left = `${newX}px`;
+            draggingElement.style.top = `${newY}px`;
+
+            const side = draggingElement.dataset.side;
+            const id = draggingElement.dataset.id;
+            const posArray = side === 'right' ? rightSensorPositions : leftSensorPositions;
+            const pos = posArray.find(p => p.id === id);
+            if (pos) {
+                pos.x = newX;
+                pos.y = newY;
+                
+                if (pressureData.length > 0) {
+                    updateVisualization(currentFrame);
+                } else {
+                    drawHeatmap({ right: [], left: [] });
+                }
+            }
+        }
+
+        function endDrag(e) {
+            if (draggingElement) {
+                draggingElement.classList.remove('dragging');
+                draggingElement = null;
+            }
+        }
+
+        function loadCSVData(csvContent) {
+            const lines = csvContent.trim().split('\n');
+            pressureData = [];
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            const rIndices = [];
+            const lIndices = [];
+            
+            for (let i = 0; i < headers.length; i++) {
+                const header = headers[i];
+                if (header.match(/^R\d+\(g\)$/)) {
+                    rIndices.push(i);
+                } else if (header.match(/^L\d+\(g\)$/)) {
+                    lIndices.push(i);
+                }
+            }
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                if (values.length >= Math.max(...rIndices, ...lIndices) + 1) {
+                    const frameData = {
+                        time: values[0] || 0,
+                        right: rIndices.map(idx => parseFloat(values[idx]) || 0),
+                        left: lIndices.map(idx => parseFloat(values[idx]) || 0)
+                    };
+                    pressureData.push(frameData);
+                }
+            }
+
+            const slider = document.getElementById('time-slider');
+            slider.max = pressureData.length > 0 ? pressureData.length - 1 : 0;
+            slider.value = 0;
+
+            updateVisualization(0);
+        }
+
+        function updateSensorUI(sensorIdPrefix, index, value) {
+            const sensorId = index + 1;
+            const sensor = document.getElementById(`${sensorIdPrefix}${sensorId}`);
+            if (sensor) {
+                sensor.textContent = Math.round(value);
+                
+                if (value < 5) {
+                    sensor.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                    sensor.style.color = '#666';
+                    sensor.style.border = '1px solid #ddd';
+                } else {
+                    const color = interpolateColor(value / 2000);
+                    sensor.style.backgroundColor = `rgba(${color.r}, ${color.g}, ${color.b}, 0.85)`;
+                    
+                    const brightness = (color.r * 299 + color.g * 587 + color.b * 114) / 1000;
+                    sensor.style.color = brightness > 125 ? '#000' : '#fff';
+                    sensor.style.border = '1px solid rgba(0,0,0,0.2)';
+                }
+            }
+        }
+
+        function updateVisualization(frameIndex) {
+            if (frameIndex < 0 || frameIndex >= pressureData.length) return;
+            
+            // 核心修复点：在此先更新状态，确保所有子调用都获取到正确同步的 currentFrame
+            currentFrame = frameIndex; 
+            
+            const frame = pressureData[currentFrame];
+            drawHeatmap(frame);
+            
+            frame.right.forEach((value, index) => updateSensorUI('right-R', index, value));
+            frame.left.forEach((value, index) => updateSensorUI('left-L', index, value));
+
+            document.getElementById('time-display').textContent = `Time: ${frame.time}s`;
+            document.getElementById('time-slider').value = currentFrame;
+        }
+
+        function play() {
+            if (isPlaying || pressureData.length === 0) return;
+            isPlaying = true;
+            playInterval = setInterval(() => {
+                const nextFrame = (currentFrame + 1) % pressureData.length;
+                updateVisualization(nextFrame);
+            }, 100);
+        }
+
+        function pause() {
+            isPlaying = false;
+            clearInterval(playInterval);
+        }
+
+        function reset() {
+            pause();
+            updateVisualization(0);
+        }
+
+        function toggleSensors() {
+            sensorsVisible = !sensorsVisible;
+            const container = document.getElementById('foot-container');
+            const btn = document.getElementById('toggle-sensors-btn');
+            
+            if (sensorsVisible) {
+                container.classList.remove('hide-sensors');
+                btn.textContent = 'Hide Sensors';
+                btn.style.backgroundColor = '#3f51b5';
+            } else {
+                container.classList.add('hide-sensors');
+                btn.textContent = 'Show Sensors';
+                btn.style.backgroundColor = '#795548';
+                
+                if (editMode) {
+                    toggleEditMode();
+                }
+            }
+        }
+
+        function toggleCoP() {
+            showCoP = !showCoP;
+            const btn = document.getElementById('toggle-cop-btn');
+            if (showCoP) {
+                btn.textContent = 'Hide CoP';
+                btn.style.backgroundColor = '#009688';
+            } else {
+                btn.textContent = 'Show CoP';
+                btn.style.backgroundColor = '#607D8B';
+            }
+            if (pressureData.length > 0) {
+                updateVisualization(currentFrame); 
+            }
+        }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            const btn = document.getElementById('edit-mode-btn');
+            const info = document.getElementById('edit-mode-info');
+            
+            if (editMode) {
+                if (!sensorsVisible) {
+                    toggleSensors();
+                }
+                btn.textContent = 'Exit Edit Mode';
+                btn.style.backgroundColor = '#E91E63';
+                info.classList.add('active');
+            } else {
+                btn.textContent = 'Edit Mode';
+                btn.style.backgroundColor = '#9C27B0';
+                info.classList.remove('active');
+            }
+        }
+
+        function savePositions() {
+            const positions = { right: rightSensorPositions, left: leftSensorPositions };
+            const dataStr = JSON.stringify(positions, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sensor-positions.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Sensor positions saved to sensor-positions.json');
+        }
+
+        function loadSavedPositions() {
+            fetch('sensor-positions.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Position file does not exist');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.right && data.left) {
+                        rightSensorPositions = data.right;
+                        leftSensorPositions = data.left;
+                    }
+                    initSensors();
+                    drawHeatmap({ right: [], left: [] }); 
+                })
+                .catch(err => {
+                    initSensors();
+                    drawHeatmap({ right: [], left: [] });
+                });
+        }
+
+        window.onload = function() {
+            initCanvas();
+            loadSavedPositions();
+
+            fetch('0102F1.csv')
+                .then(response => response.text())
+                .then(data => loadCSVData(data))
+                .catch(err => console.log('Failed to load default file, please upload manually', err));
+
+            // Add event listener to update the custom file name display
+            document.getElementById('file-input').addEventListener('change', function(e) {
+                const fileNameDisplay = document.getElementById('file-name-display');
+                if (e.target.files.length > 0) {
+                    fileNameDisplay.textContent = e.target.files[0].name;
+                } else {
+                    fileNameDisplay.textContent = 'No file chosen';
+                }
+            });
+
+            document.getElementById('load-btn').addEventListener('click', () => {
+                const fileInput = document.getElementById('file-input');
+                if (fileInput.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => loadCSVData(e.target.result);
+                    reader.readAsText(fileInput.files[0]);
+                }
+            });
+
+            document.getElementById('play-btn').addEventListener('click', play);
+            document.getElementById('pause-btn').addEventListener('click', pause);
+            document.getElementById('reset-btn').addEventListener('click', reset);
+            document.getElementById('edit-mode-btn').addEventListener('click', toggleEditMode);
+            document.getElementById('save-positions-btn').addEventListener('click', savePositions);
+            document.getElementById('toggle-sensors-btn').addEventListener('click', toggleSensors);
+            document.getElementById('toggle-cop-btn').addEventListener('click', toggleCoP);
+
+            document.getElementById('time-slider').addEventListener('input', (e) => {
+                updateVisualization(parseInt(e.target.value));
+            });
+            
+            window.addEventListener('resize', () => {
+                initCanvas();
+                if (pressureData.length > 0) {
+                    updateVisualization(currentFrame);
+                } else {
+                    drawHeatmap({ right: [], left: [] });
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ankle Sprain Risk Assessment</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <style>
+      body {
+        background: #ffffff no-repeat fixed top left;
+        font-family:'Arial', sans-serif;
+      }
+      .blue-text {
+      color: blue;
+      }
+      .floating-box {
+      position: fixed; /* 使用 fixed 定位 */
+      display: none; /* 初始状态隐藏 */
+      top: 40%; /* 距离顶部的距离 */
+      left: 35%; /* 距离左侧的距离 */
+      transform: translate(-50%, -50%); /* 让浮动框水平垂直居中 */
+      background-color: #fff; /* 设置背景颜色 */
+      padding: 12px; /* 设置内边距 */
+      border:1px solid #000; /* 设置边框 */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 设置阴影 */
+      z-index: 999; /* 设置 z-index 值，确保浮动框在其他元素之上 */
+    }
+
+    /* 设置关闭按钮的样式 */
+    .close-btn {
+      position: absolute; /* 使用 absolute 定位 */
+      top: 5px; /* 距离顶部的距离 */
+      right: 5px; /* 距离右侧的距离 */
+      cursor: pointer; /* 鼠标样式为手型 */
+    }
+    
+    /* Visualization Styles */
+    .viz-box {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Foot Pressure Styles */
+    .foot-container {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      background-color: #ffffff;
+    }
+    .foot-container canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .foot-container .sensor {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid #333;
+      border-radius: 3px;
+      user-select: none;
+      z-index: 10;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .foot-container.hide-sensors .sensor {
+      display: none !important;
+    }
+    .foot-legend {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255,255,255,0.95);
+      padding: 8px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      font-size: 10px;
+    }
+    .foot-legend-bar {
+      width: 15px;
+      height: 100px;
+      background: linear-gradient(to top, rgb(41, 51, 117) 0%, rgb(84, 158, 191) 20%, rgb(132, 193, 115) 40%, rgb(222, 215, 86) 60%, rgb(216, 117, 50) 80%, rgb(159, 39, 36) 100%);
+      border: 1px solid #333;
+      margin: 0 auto;
+    }
+    .foot-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .foot-controls button {
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      color: white;
+    }
+    .foot-btn-play { background-color: #4CAF50; }
+    .foot-btn-pause { background-color: #ff9800; }
+    .foot-btn-reset { background-color: #f44336; }
+    
+    /* IMU & Kinect 3D Container */
+    .imu-container, .kinect-container {
+      width: 100%;
+      height: 220px;
+      background-color: #050505;
+      border-radius: 6px;
+      position: relative;
+    }
+    
+    /* Chart Styles */
+    .chart-mini-container {
+      height: 80px;
+      position: relative;
+      margin-top: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      padding: 4px;
+    }
+    
+    /* Viz Controls */
+    .viz-controls {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .viz-controls button {
+      padding: 3px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 3px;
+      color: white;
+    }
+    .viz-btn-play { background-color: #4CAF50; }
+    .viz-btn-pause { background-color: #ff9800; }
+    .viz-btn-reset { background-color: #f44336; }
+    .viz-slider {
+      flex: 1;
+      height: 4px;
+    }
+    .viz-time {
+      font-size: 10px;
+      color: #666;
+      min-width: 60px;
+    }
+    </style>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  </head>
+  <div class="floating-box" id="floatingBoxEC">
+    <span class="close-btn" onclick="closeFloatingBox()"></span>
+    <p>&#42;: Equal contribution.</p>
+    <p>&#167;: Corresponding author.</p>
+  </div>
+  <!-- cover -->
+  <section>
+    <div class="jumbotron text-center mt-0">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <br>
+            <h1><b>Ankle Sprain Risk Assessment</b></h1>
+            <br>
+            <h2> 
+              <a>Author Name<sup id="EC" class="blue-text">&#42;&#167;</sup><sup>1</sup></a> &nbsp;&nbsp; 
+              <a>Author Name<sup id="EC2" class="blue-text">&#42;</sup><sup>1</sup></a> &nbsp;&nbsp;
+              <a>Author Name<sup>2</sup></a> &nbsp;&nbsp;
+            </h2>
+            <h3>
+              <br>
+              <p> <sup>1 </sup>Beijing Sport University &nbsp;&nbsp;<sup>2 </sup>Collaborating Institution
+            </h3>
+            <br>
+            <h3><b>Conference/Journal Name</b></h3>
+            </p>  
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    var floatingBox = document.getElementById('floatingBoxEC');
+    var Text = document.getElementById('EC');
+    var Text2 = document.getElementById('EC2');
+    
+    // 鼠标移动到文本时显示浮动框
+    Text.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出文本时隐藏浮动框
+    Text.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
+
+    Text2.addEventListener('mouseenter', function() {
+      floatingBox.style.display = 'block';
+    });
+    
+    // 鼠标移出文本时隐藏浮动框
+    Text2.addEventListener('mouseleave', function() {
+      floatingBox.style.display = 'none';
+    });
+    
+    function closeFloatingBox() {
+      floatingBox.style.display = 'none'; // 隐藏浮动框
+    }
+//-----------------------------------------------------------------
+
+    </script>
+
+  <!-- abstract -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Abstract</b></h1>
+          <br>
+          <h4>
+            <p class="text-justify"><b><i><font face="Times New Roman">
+              This project focuses on ankle sprain risk assessment using 3D vision and machine learning techniques. We aim to develop a comprehensive system for detecting and evaluating ankle sprain risks during various movements.
+            </font></i></b>
+            </p>
+              <br>
+          </h4>
+          <!--colorful gradient line-->
+          <br>
+          <br>
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data acquisition and preprocessing -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h1><b>Data acquisition and preprocessing</b></h1>
+            <br>
+           <div class="row justify-content-center align-items-center g-4">
+             <div class="col-6 text-center">
+              <img class="img-fluid" src="images/scene layout.png" alt="Scene Layout" 
+                 style="height: 450px; width: 100%; object-fit: contain;">
+              <p class="mt-2"><b>(a) Scene Layout</b></p>
+             </div>
+             <div class="col-6 text-center">
+              <img class="img-fluid" src="images/pose demonstration.png" alt="Pose Demonstration" 
+                 style="height: 450px; width: 100%; object-fit: contain;">
+              <p class="mt-2"><b>(b) Pose Demonstration</b></p>
+             </div>
+            </div>
+            <br>
+              <div class="row justify-content-center align-items-center g-4">
+                <div class="col-6 text-center">
+                  <img 
+                    class="img-fluid" 
+                    src="images/data-pre-process.png" 
+                    alt="Data Pre-processing"
+                    style="height: 450px; width: 100%; object-fit: contain;"
+                  >
+                  <p class="mt-2"><b>(c) Data Pre-processing</b></p>
+                </div>
+                <div class="col-6 text-center">
+                  <img 
+                    class="img-fluid" 
+                    src="images/data structure.png" 
+                    alt="Data Structure"
+                    style="height: 450px; width: 100%; object-fit: contain;"
+                  >
+                  <p class="mt-2"><b>(d) Data Structure</b></p>
+                </div>
+                </div>
+
+            <h4><b><p class="text-justify"><font face="Times New Roman">
+              The capturing of poses in MM-Motion. 
+    (a) Scene layout. Three experimenters are involved: one is responsible for controlling the IMU and master-Kinect, one for controlling the sub-Kinect and pressure insole, and one for demonstrating the movements. 
+    (b) Pose Demonstration. The process of demonstrating movements for data collection.
+    (c) Data Pre-processing. The three modalities of data are processed separately and aligned by timestamps. 
+    (d) Data Structure. The dataset adopts a hierarchical structure, divided by subjects, actions, times, and data types.
+            </font></p></b></h4>
+            <h4><b><p class="text-justify">
+
+            </p></b></h4>
+            <!--colorful gradient line-->
+            <br>
+
+            <div class="box-show text-center mt-0"> </div>
+
+
+        </div>
+      </div>
+    </div>
+  </section>
+            <br>
+             <br>
+  <!-- RGB and IMU Examples -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+            <h1><b> RGB and IMU Examples</b></h1>
+            <br>
+            <!-- 第一排：3405 / 0609 / 4116 -->
+<div class="row justify-content-center" style="gap: 50px;">
+  <div class="col-auto text-center">
+    <!-- 实景图 + 骨骼图 横向排列 -->
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/3405.jpg" alt="subject34 pose05" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/3405-ezgif.com-loop-count.gif" alt="subject34 pose05 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <!-- 下方文字标注 -->
+    <p class="mt-2 fw-bold">subject34 pose05</p>
+  </div>
+  <div class="col-auto text-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/0609.png" alt="subject06 pose09" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/0609-ezgif.com-loop-count.gif" alt="subject06 pose09 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <p class="mt-2 fw-bold">subject06 pose09</p>
+  </div>
+  <div class="col-auto text-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/4116.png" alt="subject41 pose16" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/4116-ezgif.com-loop-count.gif" alt="subject41 pose16 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <p class="mt-2 fw-bold">subject41 pose16</p>
+  </div>
+</div>
+
+<!-- 第二排：3701 / 2104 / 1710 -->
+<div class="row justify-content-center" style="gap: 50px; margin-top: 20px;">
+  <div class="col-auto text-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/3701.png" alt="subject37 pose01" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/3701-ezgif.com-loop-count.gif" alt="subject37 pose01 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <p class="mt-2 fw-bold">subject37 pose01</p>
+  </div>
+  <div class="col-auto text-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/2104.png" alt="subject21 pose04" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/2104-ezgif.com-loop-count.gif" alt="subject21 pose04 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <p class="mt-2 fw-bold">subject21 pose04</p>
+  </div>
+  <div class="col-auto text-center">
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="img-fluid" src="images/IMU-rgb/1710.png" alt="subject17 pose10" style="max-height: 200px; object-fit: contain;">
+      <img class="img-fluid" src="images/IMU-rgb/1710-ezgif.com-loop-count.gif" alt="subject17 pose10 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
+    </div>
+    <p class="mt-2 fw-bold">subject17 pose10</p>
+  </div>
+</div>
+
+            <h4><b><p class="text-justify"><font face="Times New Roman">
+              The figure above shows a comparison of RGB images and IMU visualized images of six subjects, including movements such as single-leg jumping, deep squat, hurdle step, and straight lunge.
+            </font></p></b></h4>
+              <h4><b><p class="text-justify">
+
+              </p></b></h4>
+              <!--colorful gradient line-->
+              <br>
+              <br>
+              <div class="box-show text-center mt-0"> </div>
+              <br>
+              <br>
+        </div>
+      </div>
+    </div>
+  </section> 
+      <!-- Visualization Dispay-->
+</section> 
+      <!-- Visualization Dispay-->
+       <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Visualization Dispay</b></h1>
+          <br>
+
+          <!-- 顶部横框：Foot Pressure -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
+                <h5 class="mb-2">Foot Pressure Data Visualization</h5>
+                <div class="foot-container" id="foot-container">
+                  <canvas id="heatmap-canvas"></canvas>
+                </div>
+                <div class="foot-legend">
+                  <div style="text-align:center; font-weight:bold; margin-bottom:4px;">Pressure (g)</div>
+                  <div style="display:flex; gap:3px;">
+                    <div style="display:flex; flex-direction:column; justify-content:space-between; height:100px; font-size:8px; text-align:right; padding-right:2px;">
+                      <span>2000</span><span>1600</span><span>1200</span><span>800</span><span>400</span><span>0</span>
+                    </div>
+                    <div class="foot-legend-bar"></div>
+                  </div>
+                </div>
+                <div class="foot-controls">
+                  <button class="foot-btn-play" onclick="footPlay()">Play</button>
+                  <button class="foot-btn-pause" onclick="footPause()">Pause</button>
+                  <button class="foot-btn-reset" onclick="footReset()">Reset</button>
+                  <button id="toggle-cop-btn" onclick="toggleCoP()" style="background-color:#9c27b0;">Hide CoP</button>
+                  <input type="range" id="foot-slider" class="viz-slider" min="0" max="100" value="0" oninput="footSeek(this.value)">
+                  <span id="foot-time" class="viz-time">Time: 0.00s</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 下方左右两个框：IMU + Kinect -->
+          <div class="row">
+            <div class="col-6">
+              <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
+                <h5 class="mb-2">IMU Data Visualization</h5>
+                <div id="imu-container" class="imu-container" style="height:280px;"></div>
+                <div class="viz-controls">
+                  <button class="viz-btn-play" onclick="imuPlay()">Play</button>
+                  <button class="viz-btn-pause" onclick="imuPause()">Pause</button>
+                  <button class="viz-btn-reset" onclick="imuReset()">Reset</button>
+                  <input type="range" id="imu-slider" class="viz-slider" min="0" max="100" value="0" oninput="imuSeek(this.value)">
+                  <span id="imu-frame" class="viz-time">Frame: 0/0</span>
+                </div>
+                <div class="chart-mini-container" style="height:120px;">
+                  <canvas id="imu-velocity-chart"></canvas>
+                </div>
+                <div class="chart-mini-container" style="height:120px;">
+                  <canvas id="imu-tilt-chart"></canvas>
+                </div>
+                <div class="chart-mini-container" style="height:140px;">
+                  <canvas id="imu-rose-chart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
+                <h5 class="mb-2">Kinect Data Visualization</h5>
+                <div id="kinect-container" class="kinect-container" style="height:280px;"></div>
+                <div class="viz-controls">
+                  <button class="viz-btn-play" onclick="kinectPlay()">Play</button>
+                  <button class="viz-btn-pause" onclick="kinectPause()">Pause</button>
+                  <button class="viz-btn-reset" onclick="kinectReset()">Reset</button>
+                  <input type="range" id="kinect-slider" class="viz-slider" min="0" max="100" value="0" oninput="kinectSeek(this.value)">
+                  <span id="kinect-frame" class="viz-time">Frame: 0/0</span>
+                </div>
+                <div class="chart-mini-container" style="height:120px;">
+                  <canvas id="kinect-speed-chart"></canvas>
+                </div>
+                <div class="chart-mini-container" style="height:120px;">
+                  <canvas id="kinect-acc-chart"></canvas>
+                </div>
+                <div class="chart-mini-container" style="height:120px;">
+                  <canvas id="kinect-pos-chart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Cite-->
+<section>
+ <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="text-center mt-0">
+          <h1><b> Cite</b></h1>
+          <br>     
+          <div class="cite1 text-center mt-0">     
+              <h5 style="font-family:Courier New"><p class="text-justify">
+                @inproceedings{AnkleSprain2026, <br>
+                title={Ankle Sprain Risk Assessment using 3D Vision and Machine Learning},<br> 
+                author={Author1, Author2, and Author3}, <br>
+                booktitle={Conference Name},
+                year={2026}, <br>
+                }
+              </h5>    
+          </div>
+      </div>
+    </div>
+  </div>
+ </div>
+
+  <script>
+    // =====================================================
+    // FOOT PRESSURE VISUALIZATION
+    // =====================================================
+    let footRightSensors = [
+      {id:'R1',x:728,y:38},{id:'R2',x:764,y:21},{id:'R3',x:795,y:28},{id:'R4',x:822,y:48},
+      {id:'R5',x:719,y:78},{id:'R6',x:763,y:71},{id:'R7',x:804,y:80},{id:'R8',x:846,y:90},{id:'R9',x:853,y:131},
+      {id:'R10',x:723,y:120},{id:'R11',x:768,y:122},{id:'R12',x:810,y:126},{id:'R13',x:771,y:165},{id:'R14',x:862,y:175},
+      {id:'R15',x:724,y:164},{id:'R16',x:785,y:211},{id:'R17',x:820,y:213},{id:'R18',x:858,y:219},{id:'R19',x:816,y:173},
+      {id:'R20',x:747,y:208},{id:'R21',x:753,y:249},{id:'R22',x:786,y:253},{id:'R23',x:824,y:257},{id:'R24',x:861,y:259},
+      {id:'R25',x:753,y:347},{id:'R26',x:762,y:299},{id:'R27',x:790,y:302},{id:'R28',x:818,y:304},{id:'R29',x:849,y:307},
+      {id:'R30',x:754,y:394},{id:'R31',x:784,y:399},{id:'R32',x:785,y:350},{id:'R33',x:815,y:350},{id:'R34',x:849,y:354},
+      {id:'R35',x:751,y:439},{id:'R36',x:814,y:403},{id:'R37',x:781,y:445},{id:'R38',x:811,y:449},{id:'R39',x:843,y:402},
+      {id:'R40',x:749,y:483},{id:'R41',x:777,y:494},{id:'R42',x:807,y:496},{id:'R43',x:836,y:492},{id:'R44',x:841,y:447},
+      {id:'R45',x:749,y:526},{id:'R46',x:770,y:547},{id:'R47',x:804,y:550},{id:'R48',x:833,y:534}
+    ];
+    let footLeftSensors = [
+      {id:'L1',x:498,y:48},{id:'L2',x:530,y:29},{id:'L3',x:560,y:18},{id:'L4',x:597,y:36},
+      {id:'L5',x:480,y:91},{id:'L6',x:517,y:80},{id:'L7',x:562,y:73},{id:'L8',x:599,y:78},{id:'L9',x:603,y:120},
+      {id:'L10',x:473,y:131},{id:'L11',x:510,y:126},{id:'L12',x:558,y:120},{id:'L13',x:550,y:165},{id:'L14',x:593,y:162},
+      {id:'L15',x:463,y:215},{id:'L16',x:501,y:213},{id:'L17',x:540,y:208},{id:'L18',x:505,y:170},{id:'L19',x:579,y:204},
+      {id:'L20',x:466,y:175},{id:'L21',x:535,y:253},{id:'L22',x:464,y:259},{id:'L23',x:497,y:256},{id:'L24',x:574,y:250},
+      {id:'L25',x:475,y:354},{id:'L26',x:474,y:307},{id:'L27',x:511,y:302},{id:'L28',x:536,y:300},{id:'L29',x:569,y:297},
+      {id:'L30',x:483,y:402},{id:'L31',x:514,y:401},{id:'L32',x:509,y:351},{id:'L33',x:537,y:346},{id:'L34',x:568,y:345},
+      {id:'L35',x:543,y:398},{id:'L36',x:575,y:392},{id:'L37',x:575,y:439},{id:'L38',x:514,y:448},{id:'L39',x:481,y:450},
+      {id:'L40',x:485,y:491},{id:'L41',x:522,y:496},{id:'L42',x:553,y:491},{id:'L43',x:581,y:482},{id:'L44',x:547,y:445},
+      {id:'L45',x:492,y:533},{id:'L46',x:521,y:548},{id:'L47',x:557,y:545},{id:'L48',x:580,y:525}
+    ];
+    const rightFootPerimeter = ['R1','R2','R3','R4','R8','R9','R14','R18','R24','R29','R34','R39','R44','R48','R47','R46','R45','R40','R35','R30','R25','R21','R20','R15','R10','R5'];
+    const leftFootPerimeter = ['L4','L3','L2','L1','L5','L10','L20','L15','L22','L26','L25','L30','L39','L40','L45','L46','L47','L48','L43','L37','L36','L34','L29','L24','L19','L14','L9','L8'];
+    
+    let footPressureData = [];
+    let footCurrentFrame = 0;
+    let footIsPlaying = false;
+    let footPlayInterval = null;
+    let footHeatmapCanvas = null;
+    let footHeatmapCtx = null;
+    let footMaskCanvas = null;
+    let footMaskCtx = null;
+    let footTempCanvas = null;
+    let footTempCtx = null;
+    let footDrawScale = 1;
+    let footDrawOffsetX = 0;
+    let footDrawOffsetY = 0;
+    let showCoP = true;
+    
+    const COLOR_STOPS = [
+      {v:0.0,c:[41,51,117]},{v:0.2,c:[84,158,191]},{v:0.4,c:[132,193,115]},
+      {v:0.6,c:[222,215,86]},{v:0.8,c:[216,117,50]},{v:1.0,c:[159,39,36]}
+    ];
+    
+    function interpolateColor(intensity) {
+      intensity = Math.max(0, Math.min(1, intensity));
+      for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
+        if (intensity >= COLOR_STOPS[i].v && intensity <= COLOR_STOPS[i+1].v) {
+          const range = COLOR_STOPS[i+1].v - COLOR_STOPS[i].v;
+          const ratio = (intensity - COLOR_STOPS[i].v) / range;
+          return {
+            r: Math.round(COLOR_STOPS[i].c[0] + ratio * (COLOR_STOPS[i+1].c[0] - COLOR_STOPS[i].c[0])),
+            g: Math.round(COLOR_STOPS[i].c[1] + ratio * (COLOR_STOPS[i+1].c[1] - COLOR_STOPS[i].c[1])),
+            b: Math.round(COLOR_STOPS[i].c[2] + ratio * (COLOR_STOPS[i+1].c[2] - COLOR_STOPS[i].c[2]))
+          };
+        }
+      }
+      return {r:255,g:0,b:0};
+    }
+    
+    function initFootCanvas() {
+      footHeatmapCanvas = document.getElementById('heatmap-canvas');
+      const container = document.getElementById('foot-container');
+      if (!container) return;
+      const w = container.offsetWidth;
+      const h = container.offsetHeight;
+      footHeatmapCanvas.width = w;
+      footHeatmapCanvas.height = h;
+      footHeatmapCtx = footHeatmapCanvas.getContext('2d');
+      footTempCanvas = document.createElement('canvas');
+      footTempCtx = footTempCanvas.getContext('2d', {willReadFrequently:true});
+      footTempCanvas.width = w;
+      footTempCanvas.height = h;
+      footMaskCanvas = document.createElement('canvas');
+      footMaskCtx = footMaskCanvas.getContext('2d');
+      footMaskCanvas.width = w;
+      footMaskCanvas.height = h;
+      
+      const origMinX = 463;
+      const origMaxX = 862;
+      const origMinY = 18;
+      const origMaxY = 550;
+      const origWidth = origMaxX - origMinX + 35;
+      const origHeight = origMaxY - origMinY + 35;
+      footDrawScale = Math.min(w / origWidth, h / origHeight) * 0.9;
+      footDrawOffsetX = (w - origWidth * footDrawScale) / 2 - (origMinX - 17.5) * footDrawScale;
+      footDrawOffsetY = (h - origHeight * footDrawScale) / 2 - (origMinY - 17.5) * footDrawScale;
+    }
+    
+    function defineSmoothPath(ctx, points) {
+      if (points.length < 3) return;
+      ctx.beginPath();
+      let startX = (points[points.length-1].x + points[0].x) / 2;
+      let startY = (points[points.length-1].y + points[0].y) / 2;
+      ctx.moveTo(startX, startY);
+      for (let i = 0; i < points.length; i++) {
+        let p1 = points[i];
+        let p2 = points[(i+1) % points.length];
+        let midX = (p1.x + p2.x) / 2;
+        let midY = (p1.y + p2.y) / 2;
+        ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+      }
+      ctx.closePath();
+    }
+    
+    function drawFootBase(ctx, points, scale) {
+      if (points.length === 0) return;
+      defineSmoothPath(ctx, points);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 55 * scale;
+      ctx.strokeStyle = '#cccccc';
+      ctx.stroke();
+      ctx.lineWidth = 51 * scale;
+      ctx.strokeStyle = '#f4f6f8';
+      ctx.stroke();
+      ctx.fillStyle = '#f4f6f8';
+      ctx.fill();
+    }
+    
+    function drawFootMask(ctx, points, scale) {
+      if (points.length === 0) return;
+      defineSmoothPath(ctx, points);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 51 * scale;
+      ctx.strokeStyle = '#000000';
+      ctx.stroke();
+      ctx.fillStyle = '#000000';
+      ctx.fill();
+    }
+    
+    function drawHeatPoint(ctx, x, y, value, radius, scale) {
+      const intensity = Math.min(value / 2000, 1);
+      const actualRadius = radius * scale * (0.8 + intensity * 0.6);
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, actualRadius);
+      gradient.addColorStop(0, 'rgba(255,255,255,' + intensity + ')');
+      gradient.addColorStop(0.3, 'rgba(255,255,255,' + (intensity*0.8) + ')');
+      gradient.addColorStop(0.7, 'rgba(255,255,255,' + (intensity*0.3) + ')');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, actualRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    function drawFootHeatmap(frame) {
+      if (!footHeatmapCtx) return;
+      const width = footHeatmapCanvas.width;
+      const height = footHeatmapCanvas.height;
+      footHeatmapCtx.clearRect(0, 0, width, height);
+      footTempCtx.clearRect(0, 0, width, height);
+      footMaskCtx.clearRect(0, 0, width, height);
+      
+      const s = footDrawScale;
+      const ox = footDrawOffsetX;
+      const oy = footDrawOffsetY;
+      
+      const rightPts = rightFootPerimeter.map(id => footRightSensors.find(p => p.id === id)).filter(p => p).map(p => ({x:(p.x+17.5)*s+ox,y:(p.y+17.5)*s+oy}));
+      const leftPts = leftFootPerimeter.map(id => footLeftSensors.find(p => p.id === id)).filter(p => p).map(p => ({x:(p.x+17.5)*s+ox,y:(p.y+17.5)*s+oy}));
+      
+      drawFootBase(footHeatmapCtx, rightPts, s);
+      drawFootBase(footHeatmapCtx, leftPts, s);
+      drawFootMask(footMaskCtx, rightPts, s);
+      drawFootMask(footMaskCtx, leftPts, s);
+      
+      const rightData = (frame && frame.right) ? frame.right : [];
+      rightData.forEach((value, index) => {
+        const pos = footRightSensors.find(p => p.id === 'R' + (index + 1));
+        if (pos && value > 0) drawHeatPoint(footTempCtx, (pos.x + 17.5) * s + ox, (pos.y + 17.5) * s + oy, value, 80, s);
+      });
+      
+      const leftData = (frame && frame.left) ? frame.left : [];
+      leftData.forEach((value, index) => {
+        const pos = footLeftSensors.find(p => p.id === 'L' + (index + 1));
+        if (pos && value > 0) drawHeatPoint(footTempCtx, (pos.x + 17.5) * s + ox, (pos.y + 17.5) * s + oy, value, 80, s);
+      });
+      
+      const imageData = footTempCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const alpha = data[i + 3];
+        if (alpha > 0) {
+          const intensity = alpha / 255;
+          const color = interpolateColor(intensity);
+          data[i] = color.r;
+          data[i + 1] = color.g;
+          data[i + 2] = color.b;
+          data[i + 3] = Math.min(alpha * 2.5, 255);
+        }
+      }
+      footTempCtx.putImageData(imageData, 0, 0);
+      footTempCtx.globalCompositeOperation = 'destination-in';
+      footTempCtx.drawImage(footMaskCanvas, 0, 0);
+      footTempCtx.globalCompositeOperation = 'source-over';
+      footHeatmapCtx.drawImage(footTempCanvas, 0, 0);
+      
+      if (showCoP && footPressureData.length > 0) {
+        drawCoPTrajectory(footHeatmapCtx, footCurrentFrame, 'left', '#2196F3');
+        drawCoPTrajectory(footHeatmapCtx, footCurrentFrame, 'right', '#F44336');
+      }
+    }
+    
+    function calculateCoP(dataArray, side) {
+      let sumPx = 0, sumPy = 0, sumP = 0;
+      const positions = side === 'right' ? footRightSensors : footLeftSensors;
+      const prefix = side === 'right' ? 'R' : 'L';
+      if (!dataArray || dataArray.length === 0) return null;
+      dataArray.forEach((val, idx) => {
+        if (val > 5) {
+          const pos = positions.find(p => p.id === prefix + (idx + 1));
+          if (pos) {
+            sumPx += val * (pos.x + 17.5);
+            sumPy += val * (pos.y + 17.5);
+            sumP += val;
+          }
+        }
+      });
+      if (sumP < 10) return null;
+      return { x: sumPx / sumP, y: sumPy / sumP };
+    }
+    
+    function drawCoPTrajectory(ctx, upToFrame, side, lineColor) {
+      if (footPressureData.length === 0) return;
+      const s = footDrawScale;
+      const ox = footDrawOffsetX;
+      const oy = footDrawOffsetY;
+      const path = [];
+      const maxSafeFrame = Math.min(upToFrame, footPressureData.length - 1);
+      for (let i = 0; i <= maxSafeFrame; i++) {
+        const frame = footPressureData[i];
+        if (!frame) continue;
+        const dataArray = side === 'right' ? (frame.right || []) : (frame.left || []);
+        const cop = calculateCoP(dataArray, side);
+        if (cop) {
+          path.push({ x: cop.x * s + ox, y: cop.y * s + oy });
+        }
+      }
+      if (path.length === 0) return;
+      ctx.beginPath();
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2.5 * s;
+      ctx.lineJoin = 'round';
+      ctx.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y);
+      }
+      ctx.stroke();
+      for (let i = 0; i < path.length; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = lineColor;
+        ctx.arc(path[i].x, path[i].y, 4 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (path.length >= 2) {
+        const last = path[path.length - 1];
+        ctx.beginPath();
+        ctx.fillStyle = lineColor;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.arc(last.x, last.y, 7 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+    
+    function toggleCoP() {
+      showCoP = !showCoP;
+      const btn = document.getElementById('toggle-cop-btn');
+      if (showCoP) {
+        btn.textContent = 'Hide CoP';
+      } else {
+        btn.textContent = 'Show CoP';
+      }
+      if (footPressureData.length > 0) {
+        updateFootVisualization(footCurrentFrame);
+      }
+    }
+    
+    function loadFootCSVData(csvContent) {
+      const lines = csvContent.trim().split('\n');
+      footPressureData = [];
+      const headers = lines[0].split(',').map(h => h.trim());
+      const rIndices = [], lIndices = [];
+      for (let i = 0; i < headers.length; i++) {
+        if (headers[i].match(/^R\d+\(g\)$/)) rIndices.push(i);
+        else if (headers[i].match(/^L\d+\(g\)$/)) lIndices.push(i);
+      }
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        if (values.length >= Math.max(...rIndices, ...lIndices) + 1) {
+          footPressureData.push({
+            time: values[0] || 0,
+            right: rIndices.map(idx => parseFloat(values[idx]) || 0),
+            left: lIndices.map(idx => parseFloat(values[idx]) || 0)
+          });
+        }
+      }
+      document.getElementById('foot-slider').max = footPressureData.length > 0 ? footPressureData.length - 1 : 0;
+      updateFootVisualization(0);
+    }
+    
+    function updateFootVisualization(frameIndex) {
+      if (frameIndex < 0 || frameIndex >= footPressureData.length) return;
+      footCurrentFrame = frameIndex;
+      const frame = footPressureData[footCurrentFrame];
+      drawFootHeatmap(frame);
+      document.getElementById('foot-time').textContent = 'Time: ' + frame.time + 's';
+      document.getElementById('foot-slider').value = footCurrentFrame;
+    }
+    
+    function footPlay() {
+      if (footIsPlaying || footPressureData.length === 0) return;
+      footIsPlaying = true;
+      footPlayInterval = setInterval(() => {
+        const nextFrame = (footCurrentFrame + 1) % footPressureData.length;
+        updateFootVisualization(nextFrame);
+      }, 100);
+    }
+    function footPause() { footIsPlaying = false; clearInterval(footPlayInterval); }
+    function footReset() { footPause(); updateFootVisualization(0); }
+    function footSeek(v) { footPause(); updateFootVisualization(parseInt(v)); }
+    
+    // =====================================================
+    // IMU VISUALIZATION
+    // =====================================================
+    let imuScene, imuCamera, imuRenderer, imuControls;
+    let imuJointMeshes = [], imuBoneMeshes = [];
+    let imuMotionData = [], imuTotalFrames = 0, imuCurrentFrame = 0, imuIsPlaying = false, imuLastTimestamp = 0;
+    let imuCharts = { velocity: null, tilt: null, rose: null };
+    let imuTrajectoryLines = { left: null, right: null };
+    let imuAnalysisResults = { velocitiesLeft: [], velocitiesRight: [], tilts: [], directions: [] };
+    
+    const IMU_FPS = 90;
+    const IMU_FRAME_INTERVAL = 1000 / IMU_FPS;
+    
+    const imuSkeletonDef = [
+      ["Hips","Hips",0,-1,["Hips-Joint-Posi-x","Hips-Joint-Posi-y","Hips-Joint-Posi-z"]],
+      ["RightUpLeg","RightUpLeg",1,0,["RightUpLeg-Joint-Posi-x","RightUpLeg-Joint-Posi-y","RightUpLeg-Joint-Posi-z"]],
+      ["RightLeg","RightLeg",2,1,["RightLeg-Joint-Posi-x","RightLeg-Joint-Posi-y","RightLeg-Joint-Posi-z"]],
+      ["RightFoot","RightFoot",3,2,["RightFoot-Joint-Posi-x","RightFoot-Joint-Posi-y","RightFoot-Joint-Posi-z"]],
+      ["LeftUpLeg","LeftUpLeg",4,0,["LeftUpLeg-Joint-Posi-x","LeftUpLeg-Joint-Posi-y","LeftUpLeg-Joint-Posi-z"]],
+      ["LeftLeg","LeftLeg",5,4,["LeftLeg-Joint-Posi-x","LeftLeg-Joint-Posi-y","LeftLeg-Joint-Posi-z"]],
+      ["LeftFoot","LeftFoot",6,5,["LeftFoot-Joint-Posi-x","LeftFoot-Joint-Posi-y","LeftFoot-Joint-Posi-z"]],
+      ["Spine","Spine",7,0,["Spine-Joint-Posi-x","Spine-Joint-Posi-y","Spine-Joint-Posi-z"]],
+      ["Spine1","Spine1",8,7,["Spine1-Joint-Posi-x","Spine1-Joint-Posi-y","Spine1-Joint-Posi-z"]],
+      ["Spine2","Spine2",9,8,["Spine2-Joint-Posi-x","Spine2-Joint-Posi-y","Spine2-Joint-Posi-z"]],
+      ["Neck","Neck",10,9,["Neck-Joint-Posi-x","Neck-Joint-Posi-y","Neck-Joint-Posi-z"]],
+      ["Neck1","Neck1",11,10,["Neck1-Joint-Posi-x","Neck1-Joint-Posi-y","Neck1-Joint-Posi-z"]],
+      ["Head","Head",12,11,["Head-Joint-Posi-x","Head-Joint-Posi-y","Head-Joint-Posi-z"]],
+      ["RightShoulder","RightShoulder",13,8,["RightShoulder-Joint-Posi-x","RightShoulder-Joint-Posi-y","RightShoulder-Joint-Posi-z"]],
+      ["RightArm","RightArm",14,13,["RightArm-Joint-Posi-x","RightArm-Joint-Posi-y","RightArm-Joint-Posi-z"]],
+      ["RightForeArm","RightForeArm",15,14,["RightForeArm-Joint-Posi-x","RightForeArm-Joint-Posi-y","RightForeArm-Joint-Posi-z"]],
+      ["RightHand","RightHand",16,15,["RightHand-Joint-Posi-x","RightHand-Joint-Posi-y","RightHand-Joint-Posi-z"]],
+      ["LeftShoulder","LeftShoulder",17,8,["LeftShoulder-Joint-Posi-x","LeftShoulder-Joint-Posi-y","LeftShoulder-Joint-Posi-z"]],
+      ["LeftArm","LeftArm",18,17,["LeftArm-Joint-Posi-x","LeftArm-Joint-Posi-y","LeftArm-Joint-Posi-z"]],
+      ["LeftForeArm","LeftForeArm",19,18,["LeftForeArm-Joint-Posi-x","LeftForeArm-Joint-Posi-y","LeftForeArm-Joint-Posi-z"]],
+      ["LeftHand","LeftHand",20,19,["LeftHand-Joint-Posi-x","LeftHand-Joint-Posi-y","LeftHand-Joint-Posi-z"]]
+    ];
+    const imuBoneConnections = imuSkeletonDef.filter(b => b[3] !== -1).map(b => [b[2], b[3]]);
+    let imuAllColumns = [];
+    imuSkeletonDef.forEach(b => imuAllColumns.push(...b[4]));
+    
+    function initIMU() {
+      const container = document.getElementById('imu-container');
+      if (!container) return;
+      const w = container.offsetWidth;
+      const h = container.offsetHeight;
+      
+      imuScene = new THREE.Scene();
+      imuScene.background = new THREE.Color(0x05070a);
+      
+      imuCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      imuCamera.position.set(3, 1.8, 3.5);
+      
+      imuRenderer = new THREE.WebGLRenderer({antialias:true});
+      imuRenderer.setSize(w, h);
+      container.appendChild(imuRenderer.domElement);
+      
+      imuControls = new THREE.OrbitControls(imuCamera, imuRenderer.domElement);
+      imuControls.target.set(0, 0.9, 0);
+      imuControls.enableDamping = true;
+      imuControls.dampingFactor = 0.05;
+      imuControls.update();
+      
+      imuScene.add(new THREE.AmbientLight(0xffffff, 0.3));
+      const spotLight = new THREE.SpotLight(0xffffff, 1.2);
+      spotLight.position.set(5, 15, 10);
+      imuScene.add(spotLight);
+      
+      const gridHelper = new THREE.GridHelper(10, 50, 0x1e293b, 0x0f172a);
+      imuScene.add(gridHelper);
+      
+      const axesHelper = new THREE.AxesHelper(0.6);
+      axesHelper.position.set(-1.5, 0, -1.5);
+      imuScene.add(axesHelper);
+      
+      initIMUCharts();
+      animateIMU();
+    }
+    
+    function initIMUCharts() {
+      const chartStyles = (x, y) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: x, color: '#64748b', font: { size: 9 } }, ticks: { color: '#475569', font: { size: 8 } }, grid: { color: '#1e293b' } },
+          y: { title: { display: true, text: y, color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' }, ticks: { color: '#475569', font: { size: 8 } } }
+        },
+        plugins: { legend: { display: true, position: 'top', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 9 } } } },
+        animation: false
+      });
+      
+      const vCtx = document.getElementById('imu-velocity-chart');
+      if (vCtx) {
+        imuCharts.velocity = new Chart(vCtx, {
+          type: 'line',
+          data: { 
+            labels: [], 
+            datasets: [
+              { label: 'Left Shank', data: [], borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.1 },
+              { label: 'Right Shank', data: [], borderColor: '#f43f5e', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.1 }
+            ] 
+          },
+          options: chartStyles('Frame', 'Angular Velocity (rad/s)')
+        });
+      }
+      
+      const tCtx = document.getElementById('imu-tilt-chart');
+      if (tCtx) {
+        imuCharts.tilt = new Chart(tCtx, {
+          type: 'line',
+          data: { labels: [], datasets: [{ label: 'Trunk Tilt', data: [], borderColor: '#00e5ff', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(0, 229, 255, 0.05)', tension: 0.1 }] },
+          options: chartStyles('Frame', 'Tilt Angle (°)')
+        });
+      }
+      
+      const rCtx = document.getElementById('imu-rose-chart');
+      if (rCtx) {
+        imuCharts.rose = new Chart(rCtx, {
+          type: 'polarArea',
+          data: {
+            labels: ['Front', 'F-Right', 'Right', 'B-Right', 'Back', 'B-Left', 'Left', 'F-Left'],
+            datasets: [{ data: Array(8).fill(0), backgroundColor: ['#ef4444aa', '#f59e0baa', '#10b981aa', '#06b6d4aa', '#00e5ffaa', '#8b5cf6aa', '#ec4899aa', '#f43f5eaa'] }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { grid: { color: '#1e293b' }, angleLines: { color: '#1e293b' }, ticks: { display: false } } },
+            plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 8 }, boxWidth: 8 } } }
+          }
+        });
+      }
+    }
+    
+    function animateIMU() {
+      requestAnimationFrame(animateIMU);
+      if (imuIsPlaying && imuTotalFrames > 0) {
+        const now = performance.now();
+        if (now - imuLastTimestamp >= IMU_FRAME_INTERVAL) {
+          imuLastTimestamp = now;
+          imuCurrentFrame = (imuCurrentFrame + 1) % imuTotalFrames;
+          updateIMUSkeleton(imuCurrentFrame);
+          document.getElementById('imu-slider').value = imuCurrentFrame;
+          document.getElementById('imu-frame').textContent = 'Frame: ' + (imuCurrentFrame + 1) + '/' + imuTotalFrames;
+        }
+      }
+      if (imuControls) imuControls.update();
+      if (imuRenderer && imuScene && imuCamera) imuRenderer.render(imuScene, imuCamera);
+    }
+    
+    function setupIMUSkeletonMeshes() {
+      imuJointMeshes.forEach(m => imuScene.remove(m));
+      imuBoneMeshes.forEach(m => imuScene.remove(m));
+      if (imuTrajectoryLines.left) imuScene.remove(imuTrajectoryLines.left);
+      if (imuTrajectoryLines.right) imuScene.remove(imuTrajectoryLines.right);
+      
+      imuJointMeshes = [];
+      imuBoneMeshes = [];
+      
+      const mat = new THREE.MeshStandardMaterial({ color: 0x00e5ff, emissive: 0x00e5ff, emissiveIntensity: 0.6, metalness: 0.9, roughness: 0.1 });
+      
+      imuSkeletonDef.forEach((bone, i) => {
+        const r = (bone[0].includes("Hand") || bone[0].includes("Foot")) ? 0.009 : 0.018;
+        const m = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 12), mat);
+        imuScene.add(m);
+        imuJointMeshes.push(m);
+      });
+      
+      imuBoneConnections.forEach(() => {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.0045, 1, 8), mat);
+        imuScene.add(m);
+        imuBoneMeshes.push(m);
+      });
+      
+      const createTrajectory = (color) => {
+        const geo = new THREE.BufferGeometry();
+        const lineMat = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.6 });
+        const line = new THREE.Line(geo, lineMat);
+        imuScene.add(line);
+        return line;
+      };
+      imuTrajectoryLines.left = createTrajectory(0x10b981);
+      imuTrajectoryLines.right = createTrajectory(0xf43f5e);
+    }
+    
+    const _v = new THREE.Vector3(), _q = new THREE.Quaternion();
+    function updateIMUSkeleton(idx) {
+      if (imuMotionData.length === 0) return;
+      const pos = imuMotionData[idx];
+      if (!pos) return;
+      
+      pos.forEach((p, i) => {
+        if (p && imuJointMeshes[i]) {
+          imuJointMeshes[i].position.copy(p);
+          imuJointMeshes[i].visible = true;
+        } else if (imuJointMeshes[i]) {
+          imuJointMeshes[i].visible = false;
+        }
+      });
+      
+      imuBoneConnections.forEach(([cIdx, pIdx], i) => {
+        const c = pos[cIdx], p = pos[pIdx];
+        if (c && p && imuBoneMeshes[i]) {
+          imuBoneMeshes[i].position.copy(p).lerp(c, 0.5);
+          _v.subVectors(c, p).normalize();
+          _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), _v);
+          imuBoneMeshes[i].scale.set(1, c.distanceTo(p), 1);
+          imuBoneMeshes[i].quaternion.copy(_q);
+          imuBoneMeshes[i].visible = true;
+        } else if (imuBoneMeshes[i]) {
+          imuBoneMeshes[i].visible = false;
+        }
+      });
+      
+      const updatePath = (line, jointIdx) => {
+        const points = [];
+        for (let k = 0; k <= idx; k++) {
+          const p = imuMotionData[k][jointIdx];
+          if (p) points.push(p.x, p.y, p.z);
+        }
+        line.geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+        line.geometry.attributes.position.needsUpdate = true;
+      };
+      updatePath(imuTrajectoryLines.right, 3);
+      updatePath(imuTrajectoryLines.left, 6);
+      
+      if (imuCharts.velocity) imuCharts.velocity.draw();
+      if (imuCharts.tilt) imuCharts.tilt.draw();
+    }
+    
+    function loadIMUCSVData(csvText) {
+      const lines = csvText.trim().split('\n');
+      if (lines.length < 2) return;
+      const header = lines[0].split(',').map(h => h.trim());
+      const colIndices = imuAllColumns.map(col => header.indexOf(col));
+      
+      imuMotionData = [];
+      let minC = new THREE.Vector3(Infinity, Infinity, Infinity);
+      let maxC = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+        const framePos = new Array(imuSkeletonDef.length);
+        let valid = false;
+        for (let j = 0; j < imuSkeletonDef.length; j++) {
+          const idxs = [colIndices[j*3], colIndices[j*3+1], colIndices[j*3+2]];
+          if (idxs[0] !== -1 && !isNaN(values[idxs[0]])) {
+            const p = new THREE.Vector3(values[idxs[0]], values[idxs[1]], values[idxs[2]]);
+            minC.min(p);
+            maxC.max(p);
+            framePos[j] = p;
+            valid = true;
+          }
+        }
+        if (valid) imuMotionData.push(framePos);
+      }
+      
+      imuTotalFrames = imuMotionData.length;
+      if (imuTotalFrames > 0) {
+        const center = minC.clone().add(maxC).multiplyScalar(0.5);
+        const scale = 1.8 / (maxC.y - minC.y || 1);
+        imuMotionData.forEach(f => f.forEach(p => p && p.sub(center).multiplyScalar(scale).add(new THREE.Vector3(0, 0.9, 0))));
+        
+        setupIMUSkeletonMeshes();
+        performIMUAnalysis();
+        
+        document.getElementById('imu-slider').max = imuTotalFrames - 1;
+        document.getElementById('imu-frame').textContent = 'Frame: 1/' + imuTotalFrames;
+        imuCurrentFrame = 0;
+        updateIMUSkeleton(0);
+      }
+    }
+    
+    function performIMUAnalysis() {
+      imuAnalysisResults = { velocitiesLeft: [0], velocitiesRight: [0], tilts: [], directions: Array(8).fill(0) };
+      
+      for (let i = 0; i < imuTotalFrames; i++) {
+        const frame = imuMotionData[i];
+        const hips = frame[0], spine = frame[9];
+        
+        if (hips && spine) {
+          const trunkVec = new THREE.Vector3().subVectors(spine, hips);
+          imuAnalysisResults.tilts.push(trunkVec.angleTo(new THREE.Vector3(0, 1, 0)) * (180 / Math.PI));
+          const angle = Math.atan2(trunkVec.x, trunkVec.z);
+          let bin = Math.round(angle / (Math.PI / 4));
+          if (bin < 0) bin += 8;
+          imuAnalysisResults.directions[bin % 8]++;
+        }
+        
+        if (i > 0) {
+          const pF = imuMotionData[i - 1];
+          const rKnee = frame[2], rAnkle = frame[3], prK = pF[2], prA = pF[3];
+          if (rKnee && rAnkle && prK && prA) {
+            const v1 = new THREE.Vector3().subVectors(rAnkle, rKnee).normalize();
+            const v2 = new THREE.Vector3().subVectors(prA, prK).normalize();
+            imuAnalysisResults.velocitiesRight.push(v1.angleTo(v2) * IMU_FPS);
+          } else {
+            imuAnalysisResults.velocitiesRight.push(0);
+          }
+          
+          const lKnee = frame[5], lAnkle = frame[6], plK = pF[5], plA = pF[6];
+          if (lKnee && lAnkle && plK && plA) {
+            const v1 = new THREE.Vector3().subVectors(lAnkle, lKnee).normalize();
+            const v2 = new THREE.Vector3().subVectors(plA, plK).normalize();
+            imuAnalysisResults.velocitiesLeft.push(v1.angleTo(v2) * IMU_FPS);
+          } else {
+            imuAnalysisResults.velocitiesLeft.push(0);
+          }
+        }
+      }
+      
+      const labels = Array.from({ length: imuTotalFrames }, (_, i) => i);
+      if (imuCharts.velocity) {
+        imuCharts.velocity.data.labels = labels;
+        imuCharts.velocity.data.datasets[0].data = imuAnalysisResults.velocitiesLeft;
+        imuCharts.velocity.data.datasets[1].data = imuAnalysisResults.velocitiesRight;
+        imuCharts.velocity.update();
+      }
+      if (imuCharts.tilt) {
+        imuCharts.tilt.data.labels = labels;
+        imuCharts.tilt.data.datasets[0].data = imuAnalysisResults.tilts;
+        imuCharts.tilt.update();
+      }
+      if (imuCharts.rose) {
+        imuCharts.rose.data.datasets[0].data = imuAnalysisResults.directions;
+        imuCharts.rose.update();
+      }
+    }
+    
+    function imuPlay() { imuIsPlaying = true; imuLastTimestamp = performance.now(); }
+    function imuPause() { imuIsPlaying = false; }
+    function imuReset() { imuIsPlaying = false; imuCurrentFrame = 0; updateIMUSkeleton(0); document.getElementById('imu-slider').value = 0; document.getElementById('imu-frame').textContent = 'Frame: 1/' + imuTotalFrames; }
+    function imuSeek(v) { imuIsPlaying = false; imuCurrentFrame = parseInt(v); updateIMUSkeleton(imuCurrentFrame); document.getElementById('imu-frame').textContent = 'Frame: ' + (imuCurrentFrame + 1) + '/' + imuTotalFrames; }
+    
+    // =====================================================
+    // KINECT VISUALIZATION
+    // =====================================================
+    let kinectScene, kinectCamera, kinectRenderer, kinectControls;
+    let kinectJointMeshes = [], kinectBoneLines = [];
+    let kinectFrames = [], kinectTotalFrames = 0, kinectCurrentFrame = 0, kinectIsPlaying = false, kinectLastTimestamp = 0;
+    let kinectCharts = { speed: null, acc: null, pos: null };
+    let kinectTargetJointId = 20;
+    
+    const kinectConnections = [
+      [26,3],[3,2],[2,1],[1,0],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[8,10],
+      [3,11],[11,12],[12,13],[13,14],[14,15],[15,16],[15,17],
+      [0,18],[18,19],[19,20],[20,21],[0,22],[22,23],[23,24],[24,25],[26,27],[27,28],[27,30]
+    ];
+    
+    function initKinect() {
+      const container = document.getElementById('kinect-container');
+      if (!container) return;
+      const w = container.offsetWidth;
+      const h = container.offsetHeight;
+      
+      kinectScene = new THREE.Scene();
+      kinectScene.background = new THREE.Color(0x050505);
+      
+      kinectCamera = new THREE.PerspectiveCamera(45, w / h, 1, 30000);
+      kinectCamera.position.set(0, 1200, 3500);
+      
+      kinectRenderer = new THREE.WebGLRenderer({antialias:true});
+      kinectRenderer.setSize(w, h);
+      container.appendChild(kinectRenderer.domElement);
+      
+      kinectControls = new THREE.OrbitControls(kinectCamera, kinectRenderer.domElement);
+      kinectControls.enableDamping = true;
+      
+      kinectScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const pointLight = new THREE.PointLight(0xffffff, 0.8);
+      pointLight.position.set(0, 5000, 5000);
+      kinectScene.add(pointLight);
+      
+      const gridHelper = new THREE.GridHelper(10000, 40, 0x333333, 0x111111);
+      kinectScene.add(gridHelper);
+      
+      const sphereGeo = new THREE.SphereGeometry(20, 16, 16);
+      for (let i = 0; i < 32; i++) {
+        const mat = new THREE.MeshPhongMaterial({color: i === 26 ? 0xffdd00 : 0xeeeeee});
+        const mesh = new THREE.Mesh(sphereGeo, mat);
+        mesh.visible = false;
+        kinectScene.add(mesh);
+        kinectJointMeshes.push(mesh);
+      }
+      
+      const lineMat = new THREE.LineBasicMaterial({color: 0x3b82f6});
+      kinectConnections.forEach(() => {
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+        const line = new THREE.Line(geo, lineMat);
+        line.visible = false;
+        kinectScene.add(line);
+        kinectBoneLines.push(line);
+      });
+      
+      initKinectCharts();
+      animateKinect();
+    }
+    
+    function initKinectCharts() {
+      const vLine = {
+        id: 'vLine',
+        afterDraw: (chart) => {
+          if (kinectTotalFrames === 0 || !chart.scales.x) return;
+          const ctx = chart.ctx;
+          const x = chart.scales.x.getPixelForValue(kinectCurrentFrame);
+          if (x < chart.chartArea.left || x > chart.chartArea.right) return;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, chart.chartArea.top);
+          ctx.lineTo(x, chart.chartArea.bottom);
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.restore();
+        }
+      };
+
+      const baseCfg = (col) => ({
+        type: 'line',
+        plugins: [vLine],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+            y: { grid: { color: 'rgba(75, 85, 99, 0.2)' }, ticks: { color: '#9ca3af', font: { size: 8 } } }
+          }
+        }
+      });
+
+      const sCtx = document.getElementById('kinect-speed-chart');
+      if (sCtx) {
+        kinectCharts.speed = new Chart(sCtx, {
+          ...baseCfg('#3b82f6'),
+          data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }] }
+        });
+      }
+
+      const aCtx = document.getElementById('kinect-acc-chart');
+      if (aCtx) {
+        kinectCharts.acc = new Chart(aCtx, {
+          ...baseCfg('#ef4444'),
+          data: { labels: [], datasets: [{ data: [], borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 }] }
+        });
+      }
+
+      const pCtx = document.getElementById('kinect-pos-chart');
+      if (pCtx) {
+        kinectCharts.pos = new Chart(pCtx, {
+          ...baseCfg('#10b981'),
+          options: {
+            ...baseCfg('#10b981').options,
+            plugins: { legend: { display: true, labels: { color: '#9ca3af', boxWidth: 8, font: { size: 8 } } } }
+          },
+          data: {
+            labels: [],
+            datasets: [
+              { label: 'X', data: [], borderColor: '#ef4444', borderWidth: 1, pointRadius: 0 },
+              { label: 'Y', data: [], borderColor: '#10b981', borderWidth: 1, pointRadius: 0 },
+              { label: 'Z', data: [], borderColor: '#3b82f6', borderWidth: 1, pointRadius: 0 }
+            ]
+          }
+        });
+      }
+    }
+    
+    function animateKinect() {
+      requestAnimationFrame(animateKinect);
+      if (kinectIsPlaying && kinectTotalFrames > 0) {
+        const now = performance.now();
+        if (now - kinectLastTimestamp >= 33) {
+          kinectLastTimestamp = now;
+          kinectCurrentFrame = (kinectCurrentFrame + 1) % kinectTotalFrames;
+          updateKinectSkeleton(kinectCurrentFrame);
+          document.getElementById('kinect-slider').value = kinectCurrentFrame;
+          document.getElementById('kinect-frame').textContent = 'Frame: ' + (kinectCurrentFrame + 1) + '/' + kinectTotalFrames;
+        }
+      }
+      if (kinectControls) kinectControls.update();
+      if (kinectRenderer && kinectScene && kinectCamera) kinectRenderer.render(kinectScene, kinectCamera);
+    }
+    
+    function updateKinectSkeleton(idx) {
+      const frame = kinectFrames[idx];
+      if (!frame) return;
+      
+      const refX = frame['joint_0_x'] || 0;
+      const refZ = frame['joint_0_z'] || 0;
+      
+      let minY = Infinity;
+      for (let i = 0; i < 32; i++) {
+        const y = frame['joint_' + i + '_y'];
+        if (y !== undefined && -y < minY) minY = -y;
+      }
+      const yOffset = -minY;
+      
+      kinectJointMeshes.forEach((mesh, i) => {
+        const x = frame['joint_' + i + '_x'];
+        const y = frame['joint_' + i + '_y'];
+        const z = frame['joint_' + i + '_z'];
+        if (x !== undefined) {
+          mesh.position.set(-(x - refX), -y + yOffset, z - refZ);
+          mesh.visible = true;
+        }
+      });
+      
+      kinectBoneLines.forEach((line, i) => {
+        const conn = kinectConnections[i];
+        const x1 = frame['joint_' + conn[0] + '_x'];
+        const y1 = frame['joint_' + conn[0] + '_y'];
+        const z1 = frame['joint_' + conn[0] + '_z'];
+        const x2 = frame['joint_' + conn[1] + '_x'];
+        const y2 = frame['joint_' + conn[1] + '_y'];
+        const z2 = frame['joint_' + conn[1] + '_z'];
+        if (x1 !== undefined && x2 !== undefined) {
+          const positions = line.geometry.attributes.position.array;
+          positions[0] = -(x1 - refX); positions[1] = -y1 + yOffset; positions[2] = z1 - refZ;
+          positions[3] = -(x2 - refX); positions[4] = -y2 + yOffset; positions[5] = z2 - refZ;
+          line.geometry.attributes.position.needsUpdate = true;
+          line.visible = true;
+        }
+      });
+      
+      if (kinectJointMeshes[0].visible) {
+        const targetPos = new THREE.Vector3(0, kinectJointMeshes[0].position.y, 0);
+        kinectControls.target.lerp(targetPos, 0.2);
+      }
+      
+      if (kinectCharts.speed) kinectCharts.speed.draw();
+      if (kinectCharts.acc) kinectCharts.acc.draw();
+      if (kinectCharts.pos) kinectCharts.pos.draw();
+    }
+    
+    function loadKinectCSVData(csvText) {
+      Papa.parse(csvText, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          kinectFrames = results.data;
+          kinectTotalFrames = kinectFrames.length;
+          if (kinectTotalFrames > 0) {
+            document.getElementById('kinect-slider').max = kinectTotalFrames - 1;
+            document.getElementById('kinect-frame').textContent = 'Frame: 1/' + kinectTotalFrames;
+            kinectCurrentFrame = 0;
+            updateKinectSkeleton(0);
+            calculateKinectPhysics();
+          }
+        }
+      });
+    }
+    
+    function calculateKinectPhysics() {
+      const labels = kinectFrames.map(f => f.frame_id);
+      const speeds = [0], accs = [0], pX = [], pY = [], pZ = [];
+      const jointId = kinectTargetJointId;
+      const sX = kinectFrames[0]['joint_' + jointId + '_x'] || 0;
+      const sY = kinectFrames[0]['joint_' + jointId + '_y'] || 0;
+      const sZ = kinectFrames[0]['joint_' + jointId + '_z'] || 0;
+
+      for (let i = 1; i < kinectFrames.length; i++) {
+        const f1 = kinectFrames[i - 1], f2 = kinectFrames[i];
+        const dt = (f2.timestamp_usec - f1.timestamp_usec) / 1000000;
+
+        const x1 = f1['joint_' + jointId + '_x'] || 0, y1 = f1['joint_' + jointId + '_y'] || 0, z1 = f1['joint_' + jointId + '_z'] || 0;
+        const x2 = f2['joint_' + jointId + '_x'] || 0, y2 = f2['joint_' + jointId + '_y'] || 0, z2 = f2['joint_' + jointId + '_z'] || 0;
+
+        const dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2)) / 1000;
+        const v = dt > 0 ? dist / dt : 0;
+        speeds.push(v);
+        accs.push(dt > 0 ? Math.abs(v - (speeds[i - 1] || 0)) / dt : 0);
+
+        pX.push((-f2['joint_' + jointId + '_x'] - (-sX)) / 1000);
+        pY.push((-f2['joint_' + jointId + '_y'] - (-sY)) / 1000);
+        pZ.push((f2['joint_' + jointId + '_z'] - sZ) / 1000);
+      }
+
+      if (kinectCharts.speed) {
+        kinectCharts.speed.data.labels = labels;
+        kinectCharts.speed.data.datasets[0].data = speeds;
+        kinectCharts.speed.update('none');
+      }
+      if (kinectCharts.acc) {
+        kinectCharts.acc.data.labels = labels;
+        kinectCharts.acc.data.datasets[0].data = accs;
+        kinectCharts.acc.update('none');
+      }
+      if (kinectCharts.pos) {
+        kinectCharts.pos.data.labels = labels;
+        kinectCharts.pos.data.datasets[0].data = pX;
+        kinectCharts.pos.data.datasets[1].data = pY;
+        kinectCharts.pos.data.datasets[2].data = pZ;
+        kinectCharts.pos.update('none');
+      }
+    }
+    
+    function kinectPlay() { kinectIsPlaying = true; kinectLastTimestamp = performance.now(); }
+    function kinectPause() { kinectIsPlaying = false; }
+    function kinectReset() { kinectIsPlaying = false; kinectCurrentFrame = 0; updateKinectSkeleton(0); document.getElementById('kinect-slider').value = 0; document.getElementById('kinect-frame').textContent = 'Frame: 1/' + kinectTotalFrames; }
+    function kinectSeek(v) { kinectIsPlaying = false; kinectCurrentFrame = parseInt(v); updateKinectSkeleton(kinectCurrentFrame); document.getElementById('kinect-frame').textContent = 'Frame: ' + (kinectCurrentFrame + 1) + '/' + kinectTotalFrames; }
+    
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+    window.addEventListener('load', () => {
+      initFootCanvas();
+      initIMU();
+      initKinect();
+      
+      fetch('data-demo/1701F2.csv')
+        .then(r => r.text())
+        .then(loadFootCSVData)
+        .catch(e => console.log('Foot CSV load failed', e));
+      
+      fetch('data-demo/1701N2.csv')
+        .then(r => r.text())
+        .then(loadIMUCSVData)
+        .catch(e => console.log('IMU CSV load failed', e));
+      
+      fetch('data-demo/1701K2Mskel.csv')
+        .then(r => r.text())
+        .then(loadKinectCSVData)
+        .catch(e => console.log('Kinect CSV load failed', e));
+    });
+    
+    window.addEventListener('resize', () => {
+      const footContainer = document.getElementById('foot-container');
+      if (footContainer && footHeatmapCanvas) {
+        const w = footContainer.offsetWidth;
+        const h = footContainer.offsetHeight;
+        footHeatmapCanvas.width = w;
+        footHeatmapCanvas.height = h;
+        footTempCanvas.width = w;
+        footTempCanvas.height = h;
+        footMaskCanvas.width = w;
+        footMaskCanvas.height = h;
+        const origMinX = 463;
+        const origMaxX = 862;
+        const origMinY = 18;
+        const origMaxY = 550;
+        const origWidth = origMaxX - origMinX + 35;
+        const origHeight = origMaxY - origMinY + 35;
+        footDrawScale = Math.min(w / origWidth, h / origHeight) * 0.9;
+        footDrawOffsetX = (w - origWidth * footDrawScale) / 2 - (origMinX - 17.5) * footDrawScale;
+        footDrawOffsetY = (h - origHeight * footDrawScale) / 2 - (origMinY - 17.5) * footDrawScale;
+        if (footPressureData.length > 0) {
+          updateFootVisualization(footCurrentFrame);
+        }
+      }
+      if (imuRenderer && imuCamera) {
+        const imuContainer = document.getElementById('imu-container');
+        if (imuContainer) {
+          imuRenderer.setSize(imuContainer.offsetWidth, imuContainer.offsetHeight);
+          imuCamera.aspect = imuContainer.offsetWidth / imuContainer.offsetHeight;
+          imuCamera.updateProjectionMatrix();
+        }
+      }
+      if (kinectRenderer && kinectCamera) {
+        const kinectContainer = document.getElementById('kinect-container');
+        if (kinectContainer) {
+          kinectRenderer.setSize(kinectContainer.offsetWidth, kinectContainer.offsetHeight);
+          kinectCamera.aspect = kinectContainer.offsetWidth / kinectContainer.offsetHeight;
+          kinectCamera.updateProjectionMatrix();
+        }
+      }
+    });
+  </script>
+
+  <footer class="text-center" style="margin-bottom:10px; font-size: medium;">
+      <hr>
+      <h6>Thanks to <a href="https://lioryariv.github.io/" target="_blank">Lior Yariv</a> for the <a href="https://lioryariv.github.io/idr/" target="_blank">website template</a>.
+      </h6>
+  </footer>
+
+</html>
