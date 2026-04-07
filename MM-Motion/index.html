@@ -3,11 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>MM-Motion: A Multimodal Human Motion Dataset Supporting 
+    <title>MM-Motion: A Multimodal Human Motion Dataset Supporting
 Action Understanding and Injury Risk Evaluation</title>
     <!-- Bootstrap -->
     <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
       body {
         background: #ffffff no-repeat fixed top left;
@@ -170,7 +172,7 @@ Action Understanding and Injury Risk Evaluation</title>
   <div class="floating-box" id="floatingBoxEC">
     <span class="close-btn" onclick="closeFloatingBox()"></span>
     <p>&#42;: Equal contribution.</p>
-    <p>&#167;: Corresponding author.</p>
+    <p>✉: Corresponding author.</p>
   </div>
   <!-- cover -->
   <section>
@@ -182,8 +184,8 @@ Action Understanding and Injury Risk Evaluation</title>
             <h1><b>MM-Motion: A Multimodal Human Motion Dataset Supporting Action Understanding and Injury Risk Evaluation</b></h1>
             <br>
             <h2> 
-              <a>Jiaqi Wu<sup id="EC" class="blue-text"></sup><sup></sup></a> &nbsp;&nbsp; 
-              <a>Jianwei Li<sup id="EC2" class="blue-text">&#167;</sup><sup></sup></a> &nbsp;&nbsp;
+              <a>Jiaqi Wu<sup id="EC" class="blue-text">*</sup><sup></sup></a> &nbsp;&nbsp; 
+              <a>Jianwei Li<sup id="EC2" class="blue-text">*</sup><sup><span style="font-size: 12px;">✉</span></sup></a> &nbsp;&nbsp;
               <a>Ruiqi Ding<sup></sup></a> &nbsp;&nbsp;
               <a>Sixuan Wang<sup></sup></a> &nbsp;&nbsp;
               <br>
@@ -194,6 +196,12 @@ Action Understanding and Injury Risk Evaluation</title>
               <br>
               <p> <sup></sup>Beijing Sport University &nbsp;&nbsp;
             </h3>
+            <br>
+            <div class="text-center">
+              <a href="https://bsu3dvlab.github.io/" target="_blank" title="Jump to research group homepage">
+                <i class="fas fa-home" style="font-size: 24px; color: #333;"></i>
+              </a>
+            </div>
             <br>
             <h3><b></b></h3>
             </p>  
@@ -269,28 +277,31 @@ Action Understanding and Injury Risk Evaluation</title>
         <div class="col-12 text-center">
             <h1><b>Data acquisition and Preprocessing</b></h1>
             <br>
-           <div class="row justify-content-center align-items-center g-4">
-             <div class="col-6 text-center">
-              <img class="img-fluid" src="images/scene layout.png" alt="Scene Layout" 
-                 style="height: 550px; width: 100%; object-fit: contain;">
+           <div class="row justify-content-center align-items-start g-4">
+             <div class="col-6 text-center" style="display: flex; flex-direction: column; align-items: center;">
+              <div style="height: 550px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                <img class="img-fluid" src="images/scene layout.png" alt="Scene Layout" 
+                   style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
               <p class="mt-2" style="font-size: 22px; font-weight: 900;"><b>(a) Scene Layout</b></p>
              </div>
-             <div class="col-6 text-center">
-              <img class="img-fluid" src="images/pose demonstration.png?v=2" alt="Pose Demonstration" 
-                 style="height: 550px; width: 100%; object-fit: contain;">
+             <div class="col-6 text-center" style="display: flex; flex-direction: column; align-items: center;">
+              <div style="height: 550px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                <img class="img-fluid" src="images/pose demonstration.png?v=2" alt="Pose Demonstration" 
+                   style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
               <p class="mt-2" style="font-size: 22px; font-weight: 900;"><b>(b) Pose Demonstration</b></p>
              </div>
             </div>
-            <br>
-              <div class="row justify-content-center align-items-center g-4">
-                <div class="col-12 text-center">
+              <div class="row justify-content-center align-items-center" style="margin: 0; padding: 0;">
+                <div class="col-12 text-center" style="margin: 0; padding: 0;">
                   <img 
                     class="img-fluid" 
-                    src="images/data-pre-process.png" 
+                    src="images/overview.png" 
                     alt="Data Pre-processing"
-                    style="height: 900px; width: 100%; object-fit: contain;"
+                    style="max-height: 800px; width: 100%; object-fit: contain; margin: 0; padding: 0; display: block;"
                   >
-                  <p class="mt-1" style="font-size: 22px; font-weight: 900;"><b>(c) Data Pre-processing</b></p>
+                  <p class="mt-2" style="font-size: 22px; font-weight: 900;"><b>(c) Data Overview</b></p>
                 </div>
               </div>
 
@@ -298,7 +309,7 @@ Action Understanding and Injury Risk Evaluation</title>
               The capture of motion in MM-Motion. 
     (a) Scene layout. Three experimenters are involved: one is responsible for controlling the IMU and master-Kinect, one for controlling the sub-Kinect and pressure insole, and one for demonstrating the movements. 
     (b) Pose Demonstration. The process of demonstrating movements for data collection.
-    (c) Data Pre-processing. The three modalities of data are processed separately and aligned by timestamps. 
+    (c) Data Overview. The four modalities of data. 
     
             </font></p></b></h4>
             <h4><b><p class="text-justify">
@@ -332,21 +343,21 @@ Action Understanding and Injury Risk Evaluation</title>
       <img class="img-fluid" src="images/IMU-rgb/3405-ezgif.com-loop-count.gif" alt="subject34 pose05 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
     <!-- 下方文字标注 -->
-    <p class="mt-2 fw-bold">subject34 pose05</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject34 pose05</p>
   </div>
   <div class="col-auto text-center">
     <div class="d-flex justify-content-center align-items-center">
       <img class="img-fluid" src="images/IMU-rgb/0609.png" alt="subject06 pose09" style="max-height: 200px; object-fit: contain;">
       <img class="img-fluid" src="images/IMU-rgb/0609-ezgif.com-loop-count.gif" alt="subject06 pose09 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
-    <p class="mt-2 fw-bold">subject06 pose09</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject06 pose09</p>
   </div>
   <div class="col-auto text-center">
     <div class="d-flex justify-content-center align-items-center">
       <img class="img-fluid" src="images/IMU-rgb/4116.png" alt="subject41 pose16" style="max-height: 200px; object-fit: contain;">
       <img class="img-fluid" src="images/IMU-rgb/4116-ezgif.com-loop-count.gif" alt="subject41 pose16 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
-    <p class="mt-2 fw-bold">subject41 pose16</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject41 pose16</p>
   </div>
 </div>
 
@@ -357,21 +368,21 @@ Action Understanding and Injury Risk Evaluation</title>
       <img class="img-fluid" src="images/IMU-rgb/3701.png" alt="subject37 pose01" style="max-height: 200px; object-fit: contain;">
       <img class="img-fluid" src="images/IMU-rgb/3701-ezgif.com-loop-count.gif" alt="subject37 pose01 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
-    <p class="mt-2 fw-bold">subject37 pose01</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject37 pose01</p>
   </div>
   <div class="col-auto text-center">
     <div class="d-flex justify-content-center align-items-center">
       <img class="img-fluid" src="images/IMU-rgb/2104.png" alt="subject21 pose04" style="max-height: 200px; object-fit: contain;">
       <img class="img-fluid" src="images/IMU-rgb/2104-ezgif.com-loop-count.gif" alt="subject21 pose04 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
-    <p class="mt-2 fw-bold">subject21 pose04</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject21 pose04</p>
   </div>
   <div class="col-auto text-center">
     <div class="d-flex justify-content-center align-items-center">
       <img class="img-fluid" src="images/IMU-rgb/1710.png" alt="subject17 pose10" style="max-height: 200px; object-fit: contain;">
       <img class="img-fluid" src="images/IMU-rgb/1710-ezgif.com-loop-count.gif" alt="subject17 pose10 GIF" style="max-height: 200px; object-fit: contain; animation-iteration-count: infinite;">
     </div>
-    <p class="mt-2 fw-bold">subject17 pose10</p>
+    <p class="mt-2" style="font-family: 'Times New Roman', serif; font-size: 25px; font-weight: bold;">subject17 pose10</p>
   </div>
 </div>
 
@@ -401,7 +412,7 @@ Action Understanding and Injury Risk Evaluation</title>
           <h1><b>Visualization Dispay</b></h1>
           <br>
 <h4><b><p class="text-justify"><font face="Times New Roman">
-              Below is a visual analysis system for three types of data, with the second trial of the first movement from Subject 17 taken as an example. The three types of data can be synchronized by timestamps, and a Unified Timeline Control is provided here to manipulate the time-synchronized visualization results. The Foot Pressure Data Visualization presents a heatmap of plantar pressure data, with an option to show or hide the Center of Pressure (CoP). In the IMU Data Visualization and Kinect Data Visualization modules, you can adjust the viewing angle and distance of the human skeleton. Additionally, time-series plots and rose plots are equipped for the IMU and Kinect data for in-depth analysis.
+              Below is a visual analysis system for three types of data.The Unified Timeline Control is provided here to manipulate the time-synchronized visualization of three types of data. The Foot Pressure Data Visualization presents a heatmap of plantar pressure data, with the Center of Pressure (CoP) trajectory. In the IMU Data Visualization and Kinect Data Visualization modules, time-series plots and rose plots are equipped for the IMU and Kinect data for in-depth analysis.
             </font></p></b></h4>
           <!-- 统一进度条 -->
           <div class="row mb-3">
@@ -453,7 +464,7 @@ Action Understanding and Injury Risk Evaluation</title>
             <div class="col-6">
               <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
                 <h5 class="mb-2">IMU Data Visualization</h5>
-                <div id="imu-container" class="imu-container" style="height:320px;"></div>
+                <div id="imu-container" class="imu-container" style="max-height:320px; min-height:250px;"></div>
                 <div class="viz-controls">
                   <button class="viz-btn-play" onclick="imuPlay()">Play</button>
                   <button class="viz-btn-pause" onclick="imuPause()">Pause</button>
@@ -461,15 +472,15 @@ Action Understanding and Injury Risk Evaluation</title>
                   <input type="range" id="imu-slider" class="viz-slider" min="0" max="100" value="0" oninput="imuSeek(this.value)">
                   <span id="imu-frame" class="viz-time">Frame: 0/0</span>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Velocity Chart</div>
                   <canvas id="imu-velocity-chart"></canvas>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Tilt Chart</div>
                   <canvas id="imu-tilt-chart"></canvas>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Spatial Distribution</div>
                   <canvas id="imu-rose-chart"></canvas>
                 </div>
@@ -478,7 +489,7 @@ Action Understanding and Injury Risk Evaluation</title>
             <div class="col-6">
               <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
                 <h5 class="mb-2">Kinect Data Visualization</h5>
-                <div id="kinect-container" class="kinect-container" style="height:320px;"></div>
+                <div id="kinect-container" class="kinect-container" style="max-height:320px; min-height:250px;"></div>
                 <div class="viz-controls">
                   <button class="viz-btn-play" onclick="kinectPlay()">Play</button>
                   <button class="viz-btn-pause" onclick="kinectPause()">Pause</button>
@@ -486,15 +497,15 @@ Action Understanding and Injury Risk Evaluation</title>
                   <input type="range" id="kinect-slider" class="viz-slider" min="0" max="100" value="0" oninput="kinectSeek(this.value)">
                   <span id="kinect-frame" class="viz-time">Frame: 0/0</span>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Speed Chart</div>
                   <canvas id="kinect-speed-chart"></canvas>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Acceleration Chart</div>
                   <canvas id="kinect-acc-chart"></canvas>
                 </div>
-                <div class="chart-mini-container" style="height:200px; margin-top:10px;">
+                <div class="chart-mini-container" style="max-height:200px; min-height:150px; margin-top:10px;">
                   <div style="font-size:13px; font-weight:600; margin-bottom:5px; color:#333;">Position Chart</div>
                   <canvas id="kinect-pos-chart"></canvas>
                 </div>
