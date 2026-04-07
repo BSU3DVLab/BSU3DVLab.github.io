@@ -1,0 +1,107 @@
+正在加载下肢专属数据...
+正在加载并清洗下肢专属动作序列，请稍候...
+✅ 截肢手术成功！全身 1071 维 -> 下肢专属 147 维 (依据文件: 0101N1.csv)
+✅ 图结构数据重组成功！输入形状变更为: (3052, 150, 7, 21)
+2026-03-25 18:39:08.431278: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:From D:\python\Python\Python313\Lib\site-packages\keras\src\backend\tensorflow\core.py:232: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
+
+
+🚀 开始训练：带残差连接的 完全体 ST-GCN 模型...
+Epoch 1/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 60s 1s/step - accuracy: 0.3712 - loss: 1.7833 - val_accuracy: 0.4558 - val_loss: 1.8409 - learning_rate: 0.0010
+Epoch 2/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 59s 1s/step - accuracy: 0.5678 - loss: 1.0926 - val_accuracy: 0.4842 - val_loss: 1.4150 - learning_rate: 0.0010
+Epoch 3/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.7015 - loss: 0.7717 - val_accuracy: 0.5347 - val_loss: 1.2968 - learning_rate: 0.0010
+Epoch 4/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 67s 1s/step - accuracy: 0.7726 - loss: 0.5986 - val_accuracy: 0.5958 - val_loss: 1.1749 - learning_rate: 0.0010
+Epoch 5/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.8129 - loss: 0.4724 - val_accuracy: 0.6474 - val_loss: 1.0494 - learning_rate: 0.0010
+Epoch 6/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.8195 - loss: 0.4337 - val_accuracy: 0.7484 - val_loss: 0.7248 - learning_rate: 0.0010
+Epoch 7/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.8686 - loss: 0.3400 - val_accuracy: 0.7337 - val_loss: 0.7722 - learning_rate: 0.0010
+Epoch 8/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 70s 1s/step - accuracy: 0.8896 - loss: 0.2923 - val_accuracy: 0.7705 - val_loss: 0.7105 - learning_rate: 0.0010
+Epoch 9/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 71s 1s/step - accuracy: 0.9102 - loss: 0.2554 - val_accuracy: 0.8095 - val_loss: 0.6266 - learning_rate: 0.0010
+Epoch 10/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 67s 1s/step - accuracy: 0.9096 - loss: 0.2370 - val_accuracy: 0.8368 - val_loss: 0.6340 - learning_rate: 0.0010
+Epoch 11/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 66s 1s/step - accuracy: 0.9184 - loss: 0.2206 - val_accuracy: 0.8432 - val_loss: 0.6085 - learning_rate: 0.0010
+Epoch 12/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 65s 1s/step - accuracy: 0.9220 - loss: 0.2055 - val_accuracy: 0.8568 - val_loss: 0.5928 - learning_rate: 0.0010
+Epoch 13/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.9240 - loss: 0.2006 - val_accuracy: 0.8505 - val_loss: 0.6013 - learning_rate: 0.0010
+Epoch 14/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.9309 - loss: 0.1856 - val_accuracy: 0.8432 - val_loss: 0.6425 - learning_rate: 0.0010
+Epoch 15/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 67s 1s/step - accuracy: 0.9358 - loss: 0.1784 - val_accuracy: 0.8705 - val_loss: 0.5089 - learning_rate: 0.0010
+Epoch 16/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.9440 - loss: 0.1511 - val_accuracy: 0.8474 - val_loss: 0.6170 - learning_rate: 0.0010
+Epoch 17/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9446 - loss: 0.1439 - val_accuracy: 0.8642 - val_loss: 0.6017 - learning_rate: 0.0010
+Epoch 18/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9476 - loss: 0.1390 - val_accuracy: 0.8779 - val_loss: 0.5927 - learning_rate: 0.0010
+Epoch 19/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 63s 1s/step - accuracy: 0.9446 - loss: 0.1410 - val_accuracy: 0.8705 - val_loss: 0.5794 - learning_rate: 0.0010
+Epoch 20/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9512 - loss: 0.1309 - val_accuracy: 0.8779 - val_loss: 0.6311 - learning_rate: 0.0010
+Epoch 21/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9590 - loss: 0.1138 - val_accuracy: 0.8589 - val_loss: 0.6616 - learning_rate: 0.0010
+Epoch 22/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9613 - loss: 0.1005 - val_accuracy: 0.8442 - val_loss: 0.6743 - learning_rate: 0.0010
+Epoch 23/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.9554 - loss: 0.1136 - val_accuracy: 0.8663 - val_loss: 0.6584 - learning_rate: 0.0010
+Epoch 24/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 69s 1s/step - accuracy: 0.9564 - loss: 0.1090 - val_accuracy: 0.8621 - val_loss: 0.6482 - learning_rate: 0.0010
+Epoch 25/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 0s 1s/step - accuracy: 0.9616 - loss: 0.1157  
+Epoch 25: ReduceLROnPlateau reducing learning rate to 0.0005000000237487257.
+48/48 ━━━━━━━━━━━━━━━━━━━━ 68s 1s/step - accuracy: 0.9571 - loss: 0.1159 - val_accuracy: 0.8463 - val_loss: 0.7569 - learning_rate: 0.0010
+Epoch 26/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 66s 1s/step - accuracy: 0.9656 - loss: 0.0952 - val_accuracy: 0.8632 - val_loss: 0.6234 - learning_rate: 5.0000e-04
+Epoch 27/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9708 - loss: 0.0773 - val_accuracy: 0.8832 - val_loss: 0.6286 - learning_rate: 5.0000e-04
+Epoch 28/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9741 - loss: 0.0687 - val_accuracy: 0.8779 - val_loss: 0.6542 - learning_rate: 5.0000e-04
+Epoch 29/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9738 - loss: 0.0693 - val_accuracy: 0.8789 - val_loss: 0.6718 - learning_rate: 5.0000e-04
+Epoch 30/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 63s 1s/step - accuracy: 0.9744 - loss: 0.0672 - val_accuracy: 0.8747 - val_loss: 0.6486 - learning_rate: 5.0000e-04
+Epoch 31/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9784 - loss: 0.0593 - val_accuracy: 0.8758 - val_loss: 0.6530 - learning_rate: 5.0000e-04
+Epoch 32/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 64s 1s/step - accuracy: 0.9797 - loss: 0.0545 - val_accuracy: 0.8726 - val_loss: 0.6560 - learning_rate: 5.0000e-04
+Epoch 33/120
+48/48 ━━━━━━━━━━━━━━━━━━━━ 66s 1s/step - accuracy: 0.9797 - loss: 0.0572 - val_accuracy: 0.8832 - val_loss: 0.6570 - learning_rate: 5.0000e-04
+
+
+==========================================
+🏆 ST-GCN 完全体最终准确率: 0.8832
+==========================================
+
+详细分类报告:
+              precision    recall  f1-score   support
+
+           0       0.88      1.00      0.94        38
+           1       0.83      0.97      0.90        31
+           2       0.91      0.97      0.94       107
+           3       0.96      0.93      0.95        86
+           4       0.74      0.65      0.69        54
+           5       1.00      0.63      0.77        27
+           6       0.76      0.87      0.81        89
+           7       0.90      0.95      0.92        57
+           8       0.93      0.93      0.93        27
+           9       1.00      1.00      1.00        55
+          10       1.00      1.00      1.00        42
+          11       0.79      0.74      0.76        74
+          12       0.79      0.89      0.84        87
+          13       0.84      0.81      0.83        64
+          14       0.87      0.75      0.81        77
+          15       0.97      0.80      0.88        35
+
+    accuracy                           0.88       950
+   macro avg       0.89      0.87      0.88       950
+weighted avg       0.87      0.87      0.88       950

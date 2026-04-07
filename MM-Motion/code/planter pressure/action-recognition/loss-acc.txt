@@ -1,0 +1,449 @@
+Epoch 1/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 21.6443 - trial_test_accuracy: 0.3089 - trial_test_macro_f1: 0.1935 - window_test_accuracy: 0.2889 - learning_rate: 0.0004
+
+Epoch 2/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 16.4950 - trial_test_accuracy: 0.4390 - trial_test_macro_f1: 0.3434 - window_test_accuracy: 0.4593 - learning_rate: 0.0004
+
+Epoch 3/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 13.6823 - trial_test_accuracy: 0.4715 - trial_test_macro_f1: 0.3804 - window_test_accuracy: 0.4741 - learning_rate: 0.0004
+
+Epoch 4/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 11.9703 - trial_test_accuracy: 0.5528 - trial_test_macro_f1: 0.5023 - window_test_accuracy: 0.5704 - learning_rate: 0.0004
+
+Epoch 5/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 10.5667 - trial_test_accuracy: 0.5447 - trial_test_macro_f1: 0.4817 - window_test_accuracy: 0.5481 - learning_rate: 0.0004
+
+Epoch 6/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 9.7357 - trial_test_accuracy: 0.5854 - trial_test_macro_f1: 0.5216 - window_test_accuracy: 0.6074 - learning_rate: 0.0004
+
+Epoch 7/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 8.4194 - trial_test_accuracy: 0.6423 - trial_test_macro_f1: 0.6032 - window_test_accuracy: 0.6667 - learning_rate: 0.0004
+
+Epoch 8/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 6.9352 - trial_test_accuracy: 0.6667 - trial_test_macro_f1: 0.6414 - window_test_accuracy: 0.6815 - learning_rate: 0.0004
+
+Epoch 9/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 6.3907 - trial_test_accuracy: 0.7236 - trial_test_macro_f1: 0.6899 - window_test_accuracy: 0.7259 - learning_rate: 0.0004
+
+Epoch 10/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 5.8896 - trial_test_accuracy: 0.6911 - trial_test_macro_f1: 0.6821 - window_test_accuracy: 0.6889 - learning_rate: 0.0004
+
+Epoch 11/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 5.3581 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7170 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 12/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.6993 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7563 - window_test_accuracy: 0.8074 - learning_rate: 0.0004
+
+Epoch 13/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.8628 - trial_test_accuracy: 0.6992 - trial_test_macro_f1: 0.6920 - window_test_accuracy: 0.6963 - learning_rate: 0.0004
+
+Epoch 14/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.9330 - trial_test_accuracy: 0.6992 - trial_test_macro_f1: 0.6432 - window_test_accuracy: 0.6963 - learning_rate: 0.0004
+
+Epoch 15/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.2980 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7360 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 16/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.7217 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7714 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 17/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.0227 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7471 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 18/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 3.4361 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7230 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 19/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.8751 - trial_test_accuracy: 0.7154 - trial_test_macro_f1: 0.6909 - window_test_accuracy: 0.7259 - learning_rate: 0.0004
+
+Epoch 20/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.2433 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7358 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 21/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 3.7721 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7753 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 22/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 3.9750 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7697 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 23/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.4849 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7915 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 24/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 4.1103 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7196 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 25/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.0874 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7442 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 26/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 3.0784 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7281 - window_test_accuracy: 0.7333 - learning_rate: 0.0004
+
+Epoch 27/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.8309 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7560 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 28/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.6453 - trial_test_accuracy: 0.8049 - trial_test_macro_f1: 0.8063 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 29/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.7652 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7945 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 30/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.1302 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7948 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 31/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.1205 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7767 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 32/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.9605 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7509 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 33/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.4633 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7486 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 34/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1066 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7524 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 35/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.2437 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7908 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 36/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.6561 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7501 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 37/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.7390 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7775 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 38/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.4083 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7161 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 39/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.5409 - trial_test_accuracy: 0.7073 - trial_test_macro_f1: 0.6918 - window_test_accuracy: 0.7111 - learning_rate: 0.0004
+
+Epoch 40/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.5067 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7688 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 41/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.9655 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7954 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 42/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.8066 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7881 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 43/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.2402 - trial_test_accuracy: 0.7154 - trial_test_macro_f1: 0.7045 - window_test_accuracy: 0.7259 - learning_rate: 0.0004
+
+Epoch 44/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.7499 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7811 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 45/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.3448 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7561 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 46/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.4611 - trial_test_accuracy: 0.7154 - trial_test_macro_f1: 0.7007 - window_test_accuracy: 0.7111 - learning_rate: 0.0004
+
+Epoch 47/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.5953 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7826 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 48/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3844 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7217 - window_test_accuracy: 0.7259 - learning_rate: 0.0004
+
+Epoch 49/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.7349 - trial_test_accuracy: 0.7154 - trial_test_macro_f1: 0.7103 - window_test_accuracy: 0.7333 - learning_rate: 0.0004
+
+Epoch 50/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.5920 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7582 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 51/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.8448 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7347 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 52/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0934 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7505 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 53/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0097 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7602 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 54/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3058 - trial_test_accuracy: 0.6829 - trial_test_macro_f1: 0.6553 - window_test_accuracy: 0.6963 - learning_rate: 0.0004
+
+Epoch 55/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.5733 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7693 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 56/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.9972 - trial_test_accuracy: 0.7073 - trial_test_macro_f1: 0.6823 - window_test_accuracy: 0.7111 - learning_rate: 0.0004
+
+Epoch 57/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.2083 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7677 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 58/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8104 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7596 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 59/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8953 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7653 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 60/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3469 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7566 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 61/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.9968 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7254 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 62/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7286 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7498 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 63/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.2559 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7705 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 64/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1065 - trial_test_accuracy: 0.6992 - trial_test_macro_f1: 0.6884 - window_test_accuracy: 0.7185 - learning_rate: 0.0004
+
+Epoch 65/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.2440 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7856 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 66/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.5504 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7400 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 67/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.2323 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7298 - window_test_accuracy: 0.7259 - learning_rate: 0.0004
+
+Epoch 68/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8244 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7742 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 69/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.4652 - trial_test_accuracy: 0.8293 - trial_test_macro_f1: 0.8245 - window_test_accuracy: 0.8296 - learning_rate: 0.0004
+
+Epoch 70/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8995 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7752 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 71/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.9759 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7679 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 72/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3763 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7652 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 73/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3387 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7976 - window_test_accuracy: 0.8074 - learning_rate: 0.0004
+
+Epoch 74/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3495 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7572 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 75/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6017 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7923 - window_test_accuracy: 0.8148 - learning_rate: 0.0004
+
+Epoch 76/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6027 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7348 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 77/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0789 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7663 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 78/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.3457 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7706 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 79/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 2.5582 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7416 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 80/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.2709 - trial_test_accuracy: 0.8049 - trial_test_macro_f1: 0.8057 - window_test_accuracy: 0.8148 - learning_rate: 0.0004
+
+Epoch 81/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1626 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7582 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 82/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0834 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7494 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 83/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7019 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7788 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 84/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6241 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7658 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 85/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6617 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7437 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 86/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7458 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7696 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 87/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1621 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7454 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 88/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.2085 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7532 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 89/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1754 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7738 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 90/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.1913 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7677 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 91/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7755 - trial_test_accuracy: 0.7236 - trial_test_macro_f1: 0.7130 - window_test_accuracy: 0.7333 - learning_rate: 0.0004
+
+Epoch 92/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3712 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7388 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 93/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4984 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7338 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 94/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5354 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7480 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 95/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6733 - trial_test_accuracy: 0.7236 - trial_test_macro_f1: 0.7152 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 96/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.2851 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7513 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 97/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4633 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7621 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 98/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5123 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7495 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 99/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4232 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7644 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 100/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4221 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7275 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 101/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8357 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7480 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 102/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3650 - trial_test_accuracy: 0.7236 - trial_test_macro_f1: 0.7181 - window_test_accuracy: 0.7185 - learning_rate: 0.0004
+
+Epoch 103/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.9781 - trial_test_accuracy: 0.8049 - trial_test_macro_f1: 0.8053 - window_test_accuracy: 0.8074 - learning_rate: 0.0004
+
+Epoch 104/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5159 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7956 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 105/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7660 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7590 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 106/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4479 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7663 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 107/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5921 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7431 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 108/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.0280 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7557 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 109/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4150 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7762 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 110/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6878 - trial_test_accuracy: 0.6829 - trial_test_macro_f1: 0.6807 - window_test_accuracy: 0.6963 - learning_rate: 0.0004
+
+Epoch 111/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7067 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7631 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 112/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3423 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7867 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 113/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.9622 - trial_test_accuracy: 0.6829 - trial_test_macro_f1: 0.6719 - window_test_accuracy: 0.6815 - learning_rate: 0.0004
+
+Epoch 114/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.3308 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7504 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 115/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.8713 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7366 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 116/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.2871 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7410 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 117/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7695 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7868 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 118/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4323 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7622 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 119/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.2890 - trial_test_accuracy: 0.7886 - trial_test_macro_f1: 0.7886 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 120/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.2372 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7310 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 121/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0600 - trial_test_accuracy: 0.7642 - trial_test_macro_f1: 0.7653 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 122/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3576 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7723 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 123/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3504 - trial_test_accuracy: 0.8130 - trial_test_macro_f1: 0.8142 - window_test_accuracy: 0.8148 - learning_rate: 0.0004
+
+Epoch 124/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3467 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7682 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 125/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3363 - trial_test_accuracy: 0.7805 - trial_test_macro_f1: 0.7778 - window_test_accuracy: 0.7926 - learning_rate: 0.0004
+
+Epoch 126/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.1913 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7406 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 127/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7263 - trial_test_accuracy: 0.7967 - trial_test_macro_f1: 0.7999 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 128/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4593 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7673 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 129/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4793 - trial_test_accuracy: 0.7236 - trial_test_macro_f1: 0.7183 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 130/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4435 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7561 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 131/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7695 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7386 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 132/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4002 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7732 - window_test_accuracy: 0.7704 - learning_rate: 0.0004
+
+Epoch 133/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5537 - trial_test_accuracy: 0.8211 - trial_test_macro_f1: 0.8182 - window_test_accuracy: 0.8148 - learning_rate: 0.0004
+
+Epoch 134/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3718 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7418 - window_test_accuracy: 0.7333 - learning_rate: 0.0004
+
+Epoch 135/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.4865 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7572 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 136/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.0863 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7687 - window_test_accuracy: 0.7778 - learning_rate: 0.0004
+
+Epoch 137/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.1808 - trial_test_accuracy: 0.7480 - trial_test_macro_f1: 0.7451 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 138/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.1885 - trial_test_accuracy: 0.6911 - trial_test_macro_f1: 0.6883 - window_test_accuracy: 0.7037 - learning_rate: 0.0004
+
+Epoch 139/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5480 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7345 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 140/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.2787 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7329 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 141/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.1413 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7319 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 142/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.3799 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7563 - window_test_accuracy: 0.7556 - learning_rate: 0.0004
+
+Epoch 143/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.6333 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7574 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 144/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.9364 - trial_test_accuracy: 0.7317 - trial_test_macro_f1: 0.7292 - window_test_accuracy: 0.7481 - learning_rate: 0.0004
+
+Epoch 145/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0075 - trial_test_accuracy: 0.8049 - trial_test_macro_f1: 0.8031 - window_test_accuracy: 0.8000 - learning_rate: 0.0004
+
+Epoch 146/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.5922 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7391 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 147/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7786 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7378 - window_test_accuracy: 0.7407 - learning_rate: 0.0004
+
+Epoch 148/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0553 - trial_test_accuracy: 0.7561 - trial_test_macro_f1: 0.7522 - window_test_accuracy: 0.7630 - learning_rate: 0.0004
+
+Epoch 149/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 0.7743 - trial_test_accuracy: 0.7724 - trial_test_macro_f1: 0.7655 - window_test_accuracy: 0.7852 - learning_rate: 0.0004
+
+Epoch 150/150
+20/20 ━━━━━━━━━━━━━━━━━━━━ - loss: 1.0805 - trial_test_accuracy: 0.7398 - trial_test_macro_f1: 0.7390 - window_test_accuracy: 0.7481 - learning_rate: 0.0004

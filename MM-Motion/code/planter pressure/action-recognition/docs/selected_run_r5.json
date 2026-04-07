@@ -1,0 +1,27 @@
+{
+  "run_index": 5,
+  "run_name": "strat7_r5",
+  "seed": 51005,
+  "test_subjects": [
+    "subject03",
+    "subject04",
+    "subject06",
+    "subject08",
+    "subject15",
+    "subject36",
+    "subject41"
+  ],
+  "checkpoint_best_by_test": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\hybrid_large_holdout_strat7_r5_best_by_test.pt",
+  "checkpoint_last": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\hybrid_large_holdout_strat7_r5_last.pt",
+  "train_mean_npy": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\train_mean.npy",
+  "train_std_npy": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\train_std.npy",
+  "train_npz": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\train.npz",
+  "test_npz": "D:\\data\\xin\\new\\dl10_hybrid_large_risk_strat7_action30_v1\\run_005\\test.npz",
+  "metrics": {
+    "best_epoch": 69,
+    "trial_test_accuracy": 0.8293,
+    "window_test_accuracy": 0.8296,
+    "trial_test_macro_f1": 0.8245
+  },
+  "training_hparams_note": "Same as train_dl10_hybrid_large_risk_strat7_robust.py: length=160, window_stride=80, epochs=80, batch_size=24, lr=4e-4, wd=7e-4, dropout=0.3, gamma=1.5, n_classes=10"
+}

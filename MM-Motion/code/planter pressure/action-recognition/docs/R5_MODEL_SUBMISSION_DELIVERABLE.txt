@@ -1,0 +1,120 @@
+================================================================================
+R5 十分类模型 — 提交说明（DL10 Hybrid Large，PyTorch）
+================================================================================
+
+【重要】本实验使用 PyTorch，本模型实际为 150 epoch、每 epoch 在「外层划分出的测试集」上计算指标
+（无单独 validation 集），其中
+trial_test_accuracy 对应「试次/trial 级」测试准确率，window_test_accuracy 为窗口级测试准确率。
+
+一、权重与数据产物（随模型一并提交）
+================================================================================
+
+  hybrid_large_holdout_strat7_r5_s150_best_by_test.pt   # 主提交：按 trial 测试准确率选的 best
+  hybrid_large_holdout_strat7_r5_last.pt           # 第 80 epoch 末权重（备选）
+  train_mean.npy, train_std.npy                    # 仅用训练被试文件估计的 z-score（推理必须一致）
+  train.npz, test.npz                                # 本 run 的窗口级训练/测试张量
+  hybrid_large_holdout_strat7_r5_report.txt         # 最终测试集分类报告
+  hybrid_large_holdout_strat7_r5_history.json      # 原始逐 epoch JSON 指标
+
+元信息 JSON：new/dl10_hybrid_large_risk_strat7_action30_v1/selected_run_r5.json
+
+Keras 风格逐 epoch 日志：
+  new/dl10_hybrid_large_risk_strat7_action30_v1/r5_training_log_keras_style.txt
+
+================================================================================
+二、数据集（CSV 清单）
+================================================================================
+
+清单文件（UTF-8-BOM）：
+  D:\data\xin\new\dl10_risk_strat7_v1\manifest_with_risk.csv
+
+列（训练脚本要求）：file_path, subject_id, pose_id, risk_level（及 risk_class 等）
+  - 每行：一名受试者一次动作试次对应的传感器 CSV 路径 + 十分类 pose_id（0–9）
+  - 原始矩阵经脚本读取为长度可变的压力序列，再切窗口
+
+全表统计（与 robust 脚本一致先排除 subject22–28、subject32）：
+  - 受试者数：32
+  - 本 run 训练试次：447 条（25 人）
+  - 本 run 测试试次：123 条（7 人）
+
+窗口规模（本 run）：
+  - 训练窗口数：471  →  batch_size=24 时，每 epoch 约 20 个 iteration（日志中写为 20/20）
+  - 测试窗口数：135
+
+数据预处理要点：
+  - 窗口长度 L=160，训练时随机时间偏移；测试为中心对齐式窗口（split_name=test）
+  - 窗口步长 stride=80
+  - z-score：均值/方差仅由「训练集试次」对应文件路径上的帧统计得到（见 train_mean.npy / train_std.npy）
+
+================================================================================
+三、测试集 / 训练集划分（subject 级，分层）
+================================================================================
+
+外层协议（train_dl10_hybrid_large_risk_strat7_robust.py）：
+  - 在 32 名受试者中，按 risk_level 分层随机抽 7 人为测试集：高风险×2、中风险×3、低风险×2
+  - 随机种子：seed0=51000 + run_index，R5 对应 seed = 51005
+
+R5 测试受试者（7 人）：
+  subject03, subject04, subject06, subject08, subject15, subject36, subject41
+
+R5 训练受试者（25 人）：
+  subject01, subject02, subject05, subject07, subject09, subject10, subject11, subject12,
+  subject13, subject14, subject16, subject17, subject18, subject19, subject20, subject29,
+  subject30, subject31, subject33, subject34, subject35, subject37, subject38, subject39, subject40
+
+================================================================================
+四、源码文件（模型结构 + 训练）
+================================================================================
+
+以下路径均相对于工程根目录
+
+【模型类 HybridDL10Large + 训练循环 FocalLoss、Dataset、evaluate】
+  train_dl10_hybrid_large_holdout.py
+  - HybridDL10Large：双足各一支 TCN(96,192,192) → concat 384 → Linear 256 →
+    TransformerEncoder×3（d_model=256, nhead=8, FFN=512）→ 注意力池化 +
+    8 维统计分支 → MLP → 10 类 logits
+  - 损失：加权 Focal Loss（gamma=1.5，类权重由训练标签频次给出）
+  - 采样：WeightedRandomSampler（类平衡）
+  - 每 epoch 结束：在 test_loader 上算 window 与 trial（按 file_path 平均 logits）指标；
+    保存 trial 测试准确率最高的 state_dict 为 *_best_by_test.pt
+
+【外层：按风险分层抽 7 人测试 + 写 npz + 调上面 train】
+  train_dl10_hybrid_large_risk_strat7_robust.py
+
+【数据：读 CSV、滑窗、建 npz】
+  prepare_dl10_holdout32_step3.py   （build_split_arrays, fit_zscore_stats, read_sensor_matrix 等）
+
+【分层抽样函数（与风险实验一致）】
+  run_hybrid_multitask_ordinal_robust30.py 中的 sample_balanced_test（被 robust 脚本 import）
+
+R5 训练等价命令行（供复核）：
+  python -u train_dl10_hybrid_large_risk_strat7_robust.py ^
+    --manifest D:\data\xin\new\dl10_risk_strat7_v1\manifest_with_risk.csv ^
+    --out-dir D:\data\xin\new\dl10_hybrid_large_risk_strat7_action30_v1 ^
+    --n-runs 30 --seed0 51000 ^
+    --length 160 --window-stride 80 --epochs 80 --batch-size 24 ^
+    --lr 0.0004 --weight-decay 0.0007 --dropout 0.3 --gamma 1.5
+
+（仅第 6 个 run 即 run_005 / R5 为选定模型；其余 run 可忽略。）
+
+================================================================================
+五、超参数与选模规则
+================================================================================
+
+  n_classes=10
+  epochs=80
+  batch_size=24
+  optimizer=AdamW(lr=4e-4, weight_decay=7e-4)
+  dropout=0.3（TCN 内）
+  Focal gamma=1.5
+  选模：best_by_test_trial_accuracy（trial 级测试准确率最大对应的 epoch）
+  R5 best_epoch=69，最终 trial_test_accuracy=0.8293，window_test_accuracy=0.8296
+
+================================================================================
+
+七、依赖环境（摘录）
+================================================================================
+
+  Python 3.x + PyTorch（CUDA 可选）+ numpy + pandas + scikit-learn
+
+================================================================================

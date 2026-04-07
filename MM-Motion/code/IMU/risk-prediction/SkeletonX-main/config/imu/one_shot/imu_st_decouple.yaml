@@ -1,0 +1,96 @@
+CA_mode: null
+DASP_mixup_ep: -1
+SADP_mixup_ep: -1
+abl_zeroout: null
+anchor_feeder_args:
+  bone: false
+  data_path: work_dir/imu_data/imu_data.npz
+  debug: false
+  p_interval:
+  - 0.95
+  split: anchor
+  use_mmap: true
+  vel: false
+  window_size: 64
+aug_base_lr: 0.002
+aux_feeder_args:
+  bone: false
+  data_path: work_dir/imu_data/imu_data.npz
+  debug: true
+  normalization: true
+  p_interval:
+  - 0.5
+  - 1
+  random_rot: false
+  split: aux
+  use_mmap: true
+  vel: false
+  window_size: 64
+base_lr: 0.001
+batch_size: 16
+bone: false
+device: []
+eval_feeder: feeders.feeder_imu.Feeder
+eval_feeder_args:
+  bone: false
+  data_path: work_dir/imu_data/imu_data.npz
+  debug: true
+  p_interval:
+  - 0.95
+  split: eval
+  use_mmap: true
+  vel: false
+  window_size: 64
+eval_interval: 1
+eval_mask_subject: false
+feat_aggr_mode: concat
+feeder: feeders.feeder_imu_subject.Feeder
+ignore_weights: []
+knn_metric: cosine
+log_interval: 100
+loss_type: CE
+lr_decay_rate: 0.1
+metric_func: null
+model: model.ctrgcn.Model
+model_args:
+  graph: graph.imu_graph.Graph
+  graph_args:
+    labeling_mode: spatial
+  num_class: 3
+  num_person: 1
+  num_point: 21
+model_saved_name: ''
+nesterov: false
+num_epoch: 25
+num_worker: 8
+one_shot_class_group: null
+optimizer: SGD
+phase: train
+pred_threshold: 0.0
+print_log: true
+save_epoch: 5
+save_interval: 1
+save_score: false
+save_sim_mat: false
+seed: 1
+show_topk:
+- 1
+- 5
+start_epoch: 0
+step:
+- 10
+- 15
+test_batch_size: 32
+test_feeder_args: {}
+test_output_subject: false
+train_feeder_args: {}
+use_p_map: false
+w_SA: null
+w_SP: null
+w_xsample: 0.1
+warm_up_epoch: 5
+weight_decay: 0.001
+weights: null
+work_dir: results/imu/st_decouple
+x_DASP: false
+x_SADP: false

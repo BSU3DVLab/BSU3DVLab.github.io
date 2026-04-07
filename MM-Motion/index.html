@@ -18,6 +18,43 @@ Action Understanding and Injury Risk Evaluation</title>
       .blue-text {
       color: blue;
       }
+      /* Custom tooltip styles */
+      .icon-link {
+        position: relative !important;
+        display: inline-block !important;
+        cursor: pointer;
+      }
+      .icon-link .custom-tooltip {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        bottom: 100% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        background-color: #333 !important;
+        color: #fff !important;
+        padding: 8px 12px !important;
+        border-radius: 4px !important;
+        font-size: 16px !important;
+        white-space: nowrap !important;
+        z-index: 9999 !important;
+        margin-bottom: 8px !important;
+        transition: opacity 0.2s;
+      }
+      .icon-link .custom-tooltip::after {
+        content: "" !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: #333 transparent transparent transparent !important;
+      }
+      .icon-link:hover .custom-tooltip {
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
       .floating-box {
       position: fixed; /* 使用 fixed 定位 */
       display: none; /* 初始状态隐藏 */
@@ -29,7 +66,7 @@ Action Understanding and Injury Risk Evaluation</title>
       border:1px solid #000; /* 设置边框 */
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 设置阴影 */
       z-index: 999; /* 设置 z-index 值，确保浮动框在其他元素之上 */
-    }
+      }
 
     /* 设置关闭按钮的样式 */
     .close-btn {
@@ -198,11 +235,21 @@ Action Understanding and Injury Risk Evaluation</title>
             </h3>
             <br>
             <div class="text-center">
-              <a href="https://bsu3dvlab.github.io/" target="_blank" title="Jump to research group homepage" style="margin-right: 20px;">
-                <i class="fas fa-home" style="font-size: 24px; color: #333;"></i>
+              <a href="https://bsu3dvlab.github.io/" target="_blank" class="icon-link" style="margin-right: 20px;">
+                <i class="fas fa-home" style="font-size: 32px; color: #333;"></i>
+                <span class="custom-tooltip">Jump to research group homepage</span>
               </a>
-              <a href="https://github.com/BSU3DVLab/BSU3DVLab.github.io/tree/main/MM-Motion" target="_blank" title="View on GitHub">
-                <i class="fab fa-github" style="font-size: 24px; color: #333;"></i>
+              <a href="https://github.com/BSU3DVLab/BSU3DVLab.github.io/tree/main/MM-Motion" target="_blank" class="icon-link" style="margin-right: 20px;">
+                <i class="fab fa-github" style="font-size: 32px; color: #333;"></i>
+                <span class="custom-tooltip">View on GitHub</span>
+              </a>
+              <a href="supplement-material.pdf" target="_blank" class="icon-link" style="margin-right: 20px;">
+                <i class="fas fa-file-pdf" style="font-size: 32px; color: #333;"></i>
+                <span class="custom-tooltip">View Supplement Material</span>
+              </a>
+              <a href="mailto:lijianwei@bsu.edu.cn?subject=MM-Motion Dataset Request" class="icon-link">
+                <i class="fas fa-envelope" style="font-size: 32px; color: #333;"></i>
+                <span class="custom-tooltip">Request Dataset Access</span>
               </a>
             </div>
             <br>

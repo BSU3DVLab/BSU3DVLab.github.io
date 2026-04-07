@@ -1,0 +1,16 @@
+{
+  "task": "DL10 3-class risk (risk_class) with frozen Hybrid windows + MIL + subject meta",
+  "protocol_name": "strat7_balanced_holdout_7subjects",
+  "equivalent_full30": "actionmil_meta_robust30_newlabels_full30_v1 run_index 20, training_seed 28020",
+  "training_seed": 28020,
+  "reproduce_cli": {"seed0": 28020, "n_runs": 1},
+  "excluded_subjects": ["subject22", "subject23", "subject24", "subject25", "subject26", "subject27", "subject28", "subject32"],
+  "test_sampling": "By risk_level: 2 high + 3 mid + 2 low subjects; RNG seed fixes the draw",
+  "test_subjects": ["subject01", "subject05", "subject06", "subject13", "subject14", "subject31", "subject36"],
+  "n_train_subjects": 25,
+  "train_subjects": ["subject02", "subject03", "subject04", "subject07", "subject08", "subject09", "subject10", "subject11", "subject12", "subject15", "subject16", "subject17", "subject18", "subject19", "subject20", "subject29", "subject30", "subject33", "subject34", "subject35", "subject37", "subject38", "subject39", "subject40", "subject41"],
+  "label_encoding": {"0": "low", "1": "mid", "2": "high", "column": "risk_class"},
+  "reported_holdout": {"acc_lr": 0.7142857142857143, "acc_mlp": 0.7142857142857143, "macro_f1": 0.7, "n_test": 7},
+  "backbone_filename": "hybrid_large_holdout_dl10_excl2232_strat7_s80_seed42_best_by_test.pt",
+  "manifest_in_package": "data/manifest_with_risk.csv"
+}
