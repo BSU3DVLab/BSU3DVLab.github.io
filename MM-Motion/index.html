@@ -247,10 +247,10 @@ Action Understanding and Injury Risk Evaluation</title>
                 <i class="fas fa-file-pdf" style="font-size: 32px; color: #333;"></i>
                 <span class="custom-tooltip">View Supplement Material</span>
               </a>
-              <a href="mailto:lijianwei@bsu.edu.cn?subject=MM-Motion Dataset Request" class="icon-link">
+              <!-- <a href="mailto:lijianwei@bsu.edu.cn?subject=MM-Motion Dataset Request" class="icon-link">
                 <i class="fas fa-envelope" style="font-size: 32px; color: #333;"></i>
                 <span class="custom-tooltip">Request Dataset Access</span>
-              </a>
+              </a>-->
             </div>
             <br>
             <h3><b></b></h3>
@@ -325,7 +325,7 @@ Action Understanding and Injury Risk Evaluation</title>
     <div class="container">
       <div class="row">
         <div class="col-12 text-center">
-            <h1><b>Data acquisition and Preprocessing</b></h1>
+            <h1><b>Data Acquisition and Preprocessing</b></h1>
             <br>
            <div class="row justify-content-center align-items-start g-4">
              <div class="col-6 text-center" style="display: flex; flex-direction: column; align-items: center;">
@@ -437,7 +437,7 @@ Action Understanding and Injury Risk Evaluation</title>
 </div>
 
             <h4><b><p class="text-justify"><font face="Times New Roman">
-              The figures above show a comparison of RGB images and IMU visualized images of six subjects, including movements such as single-leg jumping, deep squat, hurdle step, and straight lunge.
+              The above figures present a comparison between RGB images and IMU visualization images from six subjects, covering movements including single-leg jumping, deep squat, hurdle step, and straight lunge.
             </font></p></b></h4>
               <h4><b><p class="text-justify">
 
@@ -459,10 +459,10 @@ Action Understanding and Injury Risk Evaluation</title>
     <div class="container">
       <div class="row">
         <div class="col-12 text-center">
-          <h1><b>Visualization Dispay</b></h1>
+          <h1><b>Data Visualization</b></h1>
           <br>
 <h4><b><p class="text-justify"><font face="Times New Roman">
-              Below is a visual analysis system for three types of data.The unified timeline control is provided here to manipulate the time-synchronized visualization of three types of data. The foot pressure data visualization presents a heatmap of plantar pressure data, with the center of pressure (CoP) trajectory. In the IMU data visualization and kinect data visualization modules, time-series plots and rose plots are equipped for the IMU and Kinect data for in-depth analysis.
+              Below is a visual analysis system for three types of data. The unified timeline control is provided here to manipulate the time-synchronized visualization of three types of data. The plantar pressure data visualization presents a heatmap of plantar pressure data, with the center of pressure (CoP) trajectory. In the IMU data visualization and kinect data visualization modules, time-series plots and rose plots are equipped for the IMU and Kinect data for in-depth analysis.
             </font></p></b></h4>
           <!-- 统一进度条 -->
           <div class="row mb-3">
@@ -484,7 +484,7 @@ Action Understanding and Injury Risk Evaluation</title>
           <div class="row mb-4">
             <div class="col-12">
               <div class="viz-box" style="border:1px solid #ddd; border-radius:8px; padding:15px; background:#fafbfc;">
-                <h5 class="mb-2">Foot Pressure Data Visualization</h5>
+                <h5 class="mb-2">Plantar Pressure Data Visualization</h5>
                 <div class="foot-container" id="foot-container">
                   <canvas id="heatmap-canvas"></canvas>
                 </div>
@@ -569,6 +569,85 @@ Action Understanding and Injury Risk Evaluation</title>
         </div>
       </div>
     </div>
+  </section>
+  <!-- download -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Dataset Download</b></h1>
+          <br>
+          <h4>
+            <p class="text-justify"><b><font face="Times New Roman">
+               If someone wants to download the 3D-Yoga dataset, please fill in the 
+            <a href="agreement/MM-Motion Dataset Agreement.docx" target="_blank" download>agreement</a>,
+            <!-- <a href="https://bsucv-my.sharepoint.com/:w:/g/personal/bsu_cv_bsucv_onmicrosoft_com/EZmI4jhHzD5CqVsFfEV3lUUBYrBggGz8-6adOsAuWnTyPg?rtime=xgQ4uOui2kg">agreement</a>, -->
+            and email Jiaqi Wu <<a href= "javascript:;">2025240795@bsu.edu.cn</a>> 
+            or Jianwei Li <<a href="javascript:;">jianwei@bsu.edu.cn</a>> to request the download link. Also, you can download the demo of MM-Motion dataset at <a href="https://zenodo.org/records/19283407" target="_blank" download>https://zenodo.org/records/19283407</a>,
+            </font></b>
+            </p>
+              <br>
+          </h4>
+          <!--colorful gradient line-->
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- acknowledgement -->
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1><b>Acknowledgement</b></h1>
+          <br>
+          <h4>
+            <p class="text-justify"><b><font face="Times New Roman">
+               This work was supported by the Beijing Natural Science Foundation (No.4262068)
+and the Innovation Project of Sports Medicine Science and Technology of General
+Administration of Sport of China (General Project No.2 of 2025). <br>We sincerely thank Qian Kang and Chen Ziyao for their assistance during the data collection process.
+            </font></b>
+            </p>
+              <br>
+          </h4>
+          <!--colorful gradient line-->
+   
+
+          <div class="box-show text-center mt-0"> </div>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- cite -->
+  <section>
+ <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="text-center mt-0">
+          <h1><b> Cite</b></h1>
+          <br>     
+          <div class="cite1 text-center mt-0">     
+              <h5 style="font-family:Courier New"><p class="text-justify">
+                @inproceedings{Wu2026MMMotion,<br>
+                title={MM-Motion: A Multimodal Human Motion Dataset Supporting Action Understanding and Injury Risk Evaluation},<br> 
+                author={Wu, Jiaqi and Li, Jianwei and Ding, Ruiqi and Wang, Sixuan and Ran, Kehao and Cao, Rui}, <br>
+                booktitle={Proceedings of the 2026 ACM Multimedia Conference},<br>
+                series={MM 2026}, <br>
+                year={2026},<br>
+                pages={To Appear},<br>
+                organization={ACM},<br>
+                note={Accepted, to appear}<br>
+                }
+              </h5>    
+          </div>
+      </div>
+    </div>
+  </div>
+ </div> 
   </section>
   <!-- Ankle Joint Health Management System -->
   <!--
